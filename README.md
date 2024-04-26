@@ -45,9 +45,9 @@ Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
 
 	I also added an "END" directive.  So often I've just wanted to alter the
 	prompt at the top and skip everything else, as a quick test, but I've
-	had to resort to using the to using the 'C' style block comment /*...*/,
-	which is fine but inconvenient, so I can now just put my short prompt
-	finish it with END and the remaining text won't be evaluated.
+	had to resort to using the 'C' style block comment /*...*/,	which is fine
+	but inconvenient, so I can now just put my short prompt	finish it with END
+	and the remaining text won't be evaluated.
 
 	I also added a "prompt" output, since I was uncertain where to find one
 	that just piped the text out in order to share with other nodes.  The
@@ -112,7 +112,7 @@ Lora Loader (Shinsplat)
 
 	For now it can only read Kohya headers for specific data, as far as I know,
 	but there are two outputs, one for cherry picked data for convenience, and the
-	other is the entirety of the meta-data, which could be huge	or almost nothing
+	other is the entirety of the meta-data, which could be huge or almost nothing
 	at all.
 
 	I see a growing trend, or maybe it's a default feature, of meta-data being
