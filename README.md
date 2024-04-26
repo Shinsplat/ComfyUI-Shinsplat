@@ -36,12 +36,21 @@ Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
 	believe it does something, though I'm not quite sure how useful it is,
 	or if it is useful at all.
 
-	As an aside, and probably a lot more important, I wanted, for quite awhile,
-	to have a prompt evaluation tool so I wrote it.  Along with the block and
-	token data, that is presented as a result of my attempt at the BREAK
-	directive, I also implemented a prompt expander, which is a second text
-	output from these two nodes, showing you exactly what the interpreter
-	sees as prompts.
+#	UPDATE
+		After revisiting the "Conditioning (Concat)" node I can see that it does
+		almost exactly what my alterations do, but there was no way for me to be
+		sure until I wrote in the BREAK alternative.  However it is more
+		convenient for me to use just a term "BREAK" in my prompt rather than
+		resort to an additional node, with multiple input noodles here and there,
+		to get the result I'm looking for so it wasn't an entire waste of time.
+
+## <cont.>
+
+	I wanted, for quite awhile, to have a prompt evaluation tool so I wrote it.
+	Along with the block and token data, that is presented as a result of my
+	attempt at the BREAK directive, I also implemented a prompt expander, which
+	is a second text output from these two nodes, showing you exactly what the
+	interpreter sees as prompts.
 
 	I also added an "END" directive.  So often I've just wanted to alter the
 	prompt at the top and skip everything else, as a quick test, but I've
