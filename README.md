@@ -1,7 +1,7 @@
 # ComfyUI-Shinsplat
 ComfyUI Node alterations that I found useful in my own projects and for friends.  At some point I'll probably make custom nodes from scratch but I started this with existing nodes and altered them to fit my needs.
 
-I have my unique silly username in the node name so that I can find them easily in search typing "shinsplat" so if you're looking for my nodes that's probably the esiest way to find them in the UI and I am going to put all ComfyUI nodes, that I create, under this heading.  I have them all falling under "advanced" since they are more complex than the original nodes and any serious work I do in this area will be extensive and complicated.
+I have my unique silly username in the node name so that I can find them easily in search typing "shinsplat" so if you're looking for my nodes that's probably the easiest way to find them in the UI and I am going to put all ComfyUI nodes, that I create, under this heading.
 
 We have a channel in our learning server (Community College) on Discord: https://critters.xyz/sd/
 
