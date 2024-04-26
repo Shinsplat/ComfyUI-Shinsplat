@@ -1,5 +1,5 @@
 # ComfyUI-Shinsplat
-ComfyUI Node alterations that I found useful in my own projects.  At some point I'll probably make custom nodes from scratch but I started this with existing nodes and altered them to fit my needs.
+ComfyUI Node alterations that I found useful in my own projects and for friends.  At some point I'll probably make custom nodes from scratch but I started this with existing nodes and altered them to fit my needs.
 
 # :wrench: ComfyUI Convenience Nodes
 
