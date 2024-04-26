@@ -114,5 +114,3 @@ Lora Loader (Shinsplat)
 	I see a growing trend, or maybe it's a default feature, of meta-data being
 	stripped, or simply not included, in these files and I hope that will change
 	in the future so that we always have a way to identify trigger phrases.
-
-
