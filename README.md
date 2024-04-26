@@ -15,48 +15,32 @@ We have a channel in our learning server (Community College) on Discord: https:/
 
 Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
 
+##	BREAK
+
 	These two nodes allow the use of the "BREAK" directive.
 
 	During my search for nodes that break up context in a prompt I discovered
 	a handful that purported to perform this task.  After utilizing all of them
 	I did not get any consistent described results, from any of them.
 
-	After deep diving into the code, and realizing I may have to write my own
-	node(s), I discovered that these fancy nodes didn't do what I thought they
-	should.
+	After creating my BREAK alternative I found that "Conditioning (Concat)"
+	performs similarly but I like having the convenience of being able to put
+	BREAK in my prompt wherever I want.
 
-	As a result I chose to implement the well known BREAK directive, that so many
-	seem to be using in Automatic1111, into ComfyUI myself.  I don't actually
-	know how well this BREAK directive is supposed to perform, at least as far
-	as a1111 is concerned, but I know what it is supposed to do and I made
-	sure it does just that, breaks up prompts into blocks, ending one and
-	starting another.
+	While I have never experienced BREAK in my travels with Automatic1111,
+	which was brief, I've read that this special term is used in their prompt
+	evaluator in order to generate separate blocks, possibly in an attempt to
+	control context.  While the implementation intent does not appear to control
+	context, in any significant way, my altered node does allow this directive
+	to designate where a block starts, by ending a previous block.
 
-	While I don't see how it effects my prompts in some positive way I do
-	believe it does something, though I'm not quite sure how useful it is,
-	or if it is useful at all.
-
-#	UPDATE
-		After revisiting the "Conditioning (Concat)" node I can see that it does
-		almost exactly what my alterations do, but there was no way for me to be
-		sure until I wrote in the BREAK alternative.  However it is more
-		convenient for me to use just a term "BREAK" in my prompt rather than
-		resort to an additional node, with multiple input noodles here and there,
-		to get the result I'm looking for so it wasn't an entire waste of time.
-
-## <cont.>
+## PROMPTS
 
 	I wanted, for quite awhile, to have a prompt evaluation tool so I wrote it.
 	Along with the block and token data, that is presented as a result of my
 	attempt at the BREAK directive, I also implemented a prompt expander, which
 	is a second text output from these two nodes, showing you exactly what the
 	interpreter sees as prompts.
-
-	I also added an "END" directive.  So often I've just wanted to alter the
-	prompt at the top and skip everything else, as a quick test, but I've
-	had to resort to using the 'C' style block comment /*...*/, which is fine
-	but inconvenient, so I can now just put my short prompt, finish it with END,
-	and the remaining text won't be evaluated.
 
 	I also added a "prompt" output, since I was uncertain where to find one
 	that just piped the text out in order to share with other nodes.  The
@@ -66,6 +50,16 @@ Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
 	have access to this.  One might wonder why I didn't just use a text node
 	to begin with and I would nod but also know that the ones I've used do
 	not support filtering comments.
+
+## END
+
+	I also added an "END" directive.  So often I've just wanted to alter the
+	prompt at the top and skip everything else, as a quick test, but I've
+	had to resort to using the 'C' style block comment /*...*/, which is fine
+	but inconvenient, so I can now just put my short prompt, finish it with END,
+	and the remaining text won't be evaluated.
+
+## PONY
 
 	For those who use the PonyXL models there is a "pony" switch to add the
 	score data to the beginning of your prompt automatically, without having
@@ -77,21 +71,17 @@ Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
 	What I have learned, at least I think I have, is that it's best to have
 	all scores included, though it can still pose a mystery and sometimes I
 	find that removing lower scores can fix a broken prompt but I know that
-	the issue is elsewhere.  So, if you are tired of adding this string of
-	scores to your prompts you can easily just use one of my Text Encoders
-	and enable the "pony" switch.
+	the issue is elsewhere.
 
 	The SDXL version of the Clip Text Encode have _g and _l input strings
-	and the reason for the separation doesn't appear to be documented.  As
-	a programmer I can imagine how this came to be, an uncertainty necessitated
-	the presence of control features in order to test how the back-end responded
-	and there was no definitive result but they thought it best to leave in
-	these options, and they do alter the image in some distinct ways though
-	I'm uncertain if it's valuable or not.  As a result I've put the pony
-	switch on both _g and _l terms.  What I have noticed, however, is if you
-	use the same prompt criteria in both _g and _l text areas you get the same
-	result as if you had used the simple Clip Text Encoder, if using the
-	default resolutions, which duplicates the _l into _g on the back-end.
+	and the reason for the separation doesn't appear to be documented.
+
+	I'm uncertain if it's valuable or not but I added the pony switch to both
+	the _g and _l terms separately.  With respect to the SDXL and Simple
+	encoder, what I have noticed is if you use the same prompt criteria in
+	both _g and _l text areas you get the same result as if you had used the
+	simple Clip Text Encoder, if using the default resolutions, which
+	duplicates the _l into _g on the back-end.
 
 	Note that, before these nodes, your BREAK command did absolutely nothing
 	to condition your prompt in ComfyUI and is, instead, lowercased to a term,
