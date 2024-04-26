@@ -46,7 +46,7 @@ Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
 	I also added an "END" directive.  So often I've just wanted to alter the
 	prompt at the top and skip everything else, as a quick test, but I've
 	had to resort to using the 'C' style block comment /*...*/, which is fine
-	but inconvenient, so I can now just put my short prompt	finish it with END
+	but inconvenient, so I can now just put my short prompt, finish it with END,
 	and the remaining text won't be evaluated.
 
 	I also added a "prompt" output, since I was uncertain where to find one
