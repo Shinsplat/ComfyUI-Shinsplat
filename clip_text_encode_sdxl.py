@@ -76,7 +76,6 @@ class Shinsplat_CLIPTextEncodeSDXL:
         start_block_g = text_g.split("END")[0]
         start_block_l = text_l.split("END")[0]
 
-        #text_blocks_g = text_g.split("BREAK")
         text_blocks_g = start_block_g.split("BREAK")
         for block in text_blocks_g:
             if len(block.strip()) == 0:
