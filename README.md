@@ -10,11 +10,8 @@ We have a channel in our learning server (Community College) on Discord: https:/
 
 ## Nodes
 
-- Clip Text Encode (Shinsplat)
-- Clip Text Encode SDXL (Shinsplat)
-- Lora Loader (Shinsplat)
-
-Clip Text Encode (Shinsplat) and Clip Text Encode SDXL (Shinsplat)
+- These modified (Clip Text Encode) and (Clip Text Encode SDXL) nodes allows the use of BREAK so you can split up your context, the END directive that allows you to skip all text after, pony features and a prompt counter with token display.
+- This modified (Lora Loader) will automatically extract metadata and potentially read trigger phrases/words.
 
 ##	BREAK
 
