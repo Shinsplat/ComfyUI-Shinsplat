@@ -91,7 +91,8 @@ class Shinsplat_CLIPTextEncode:
         # If I didn't get any good tokens then this will pose a problem,
         # just default to what it would normally do.
         if len(tokens) == 0:
-            tokens = clip.tokenize(text)
+            #tokens = clip.tokenize(text)
+            tokens = clip.tokenize(start_block)
 
         # I'll gather the token data so they can use it as a guide to structure their prompt better.
         #
