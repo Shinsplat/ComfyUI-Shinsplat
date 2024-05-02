@@ -76,11 +76,18 @@ class Shinsplat_CLIPTextEncode:
             #
             # is it XL or SD?
             # 'l' always exists, this node should be compatible with SD and XL.
-            if True:
-                if 'l' not in tokens:
-                    tokens['l'] = []
-                for tensor_block in temp_tokens['l']:
-                    tokens['l'].append(tensor_block)
+
+            # In case they are using SD 2.1, 768 ?  It's contained in 'h' layer
+            base_block = 'l'
+        
+            if 'h' in temp_tokens:
+                base_block = 'h'
+
+            if base_block in temp_tokens:
+                if base_block not in tokens:
+                    tokens[base_block] = []
+                for tensor_block in temp_tokens[base_block]:
+                    tokens[base_block].append(tensor_block)
             # 'g' exists in XL models
             if 'g' in temp_tokens:
                 if 'g' not in tokens:
@@ -107,11 +114,11 @@ class Shinsplat_CLIPTextEncode:
         last_token = "Null"
 
         tokens_count += "clip has "
-        tokens_count += str(len(tokens['l'])) + " blocks\n"
+        tokens_count += str(len(tokens[base_block])) + " blocks\n"
         block_number = 0
         token_count = 0
-        for tokens_l in tokens['l']:
-            for token, weight, in tokens_l:
+        for tokens_base_block in tokens[base_block]:
+            for token, weight, in tokens_base_block:
                 if token == 49407:
                     break
                 else:
@@ -154,10 +161,10 @@ class Shinsplat_CLIPTextEncode:
         # Pull out the token words using the integer.
         tokens_used = ""
         block_number = 0
-        for tokens_l in tokens['l']:
+        for tokens_base_block in tokens[base_block]:
             block_number += 1
             tokens_used += "\n" + "- block: " + str(block_number) + " -\n"
-            for token, weight, in tokens_l:
+            for token, weight, in tokens_base_block:
                 if token == 49406: # Start token
                     continue
                 if token == 49407: # End token
