@@ -121,8 +121,9 @@ Lora Loader (Shinsplat)
 	You can use this to pass the text path from one lora to another.  I use this
 	in order to test different checkpoint models with the same set of loras.
 
-	This probably loads the lora each time it's addressed.  Use the path_in
-	to the path_out of the target loras, then enable pass_through on the target.
+	This probably loads the lora each time it's addressed.  Use the path_out
+	to the path_in of the target loras, then enable pass_through on the target.
+
 
 
 
