@@ -115,3 +115,16 @@ Lora Loader (Shinsplat)
 	I see a growing trend, or maybe it's a default feature, of meta-data being
 	stripped, or simply not included, in these files and I hope that will change
 	in the future so that we always have a way to identify trigger phrases.
+
+## pass_through
+
+	You can use this to pass the text path from one lora to another.  I use this
+	in order to test different checkpoint models with the same set of loras.
+
+	This probably loads the lora each time it's addressed.  Use the path_in
+	to the path_out of the target loras, then enable pass_through on the target.
+
+
+
+
+
