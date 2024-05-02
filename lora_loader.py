@@ -36,20 +36,36 @@ class Shinsplat_LoraLoader:
                               "lora_name": (folder_paths.get_filename_list("loras"), ),
                               "strength_model": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
                               "strength_clip": ("FLOAT", {"default": 1.0, "min": -20.0, "max": 20.0, "step": 0.01}),
-                             }}
-    RETURN_TYPES = ("MODEL", "CLIP", "STRING",      "STRING")
-    RETURN_NAMES = ("MODEL", "CLIP", "triggers",    "meta")
+                              "pass_through": ("BOOLEAN", {"default": False}),
+                             },
+                "optional": {
+                            "path_in": ("STRING", {"multiline": False, "default": "", "forceInput": True}),                
+                            }
+                }
+
+    RETURN_TYPES = ("MODEL", "CLIP", "STRING",      "STRING",   "STRING")
+    RETURN_NAMES = ("MODEL", "CLIP", "path_out",    "triggers", "meta")
 
     FUNCTION = "load_lora"
 
     CATEGORY = "advanced/Shinsplat"
 
-    def load_lora(self, model, clip, lora_name, strength_model, strength_clip):
+    def load_lora(self, model, clip, lora_name, strength_model, strength_clip, pass_through=False, path_in=""):
 
         if strength_model == 0 and strength_clip == 0:
             return (model, clip)
 
         lora_path = folder_paths.get_full_path("loras", lora_name)
+
+        # Overwrite the lora_path if pass_through is enabled.  This allows me to have separate models passing
+        # through the same loras, but they are probably loaded fully again.  I used this to compare different
+        # models with the same set of loras.
+        if pass_through == True:
+            lora_path = path_in
+
+        path_out = lora_path
+        # #
+
         lora = None
         if self.loaded_lora is not None:
             if self.loaded_lora[0] == lora_path:
@@ -207,7 +223,7 @@ class Shinsplat_LoraLoader:
         # -----------------------------------------------------------------------------
 
         triggers, meta_string = get_meta(lora_path)
-        return (model_lora, clip_lora, triggers, meta_string)
+        return (model_lora, clip_lora, path_out, triggers, meta_string)
 
 # --------------------------------------------------------------------------------
 #
