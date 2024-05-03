@@ -54,6 +54,9 @@ class Shinsplat_CLIPTextEncode:
 
         text_raw = text
 
+        # This could be 'h' later if using SD 2.1 768 .
+        base_block = 'l'
+
         # Put the pony stuff in if they wanted it.
         if pony == True:
                 text = "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, BREAK" + text
@@ -78,7 +81,6 @@ class Shinsplat_CLIPTextEncode:
             # 'l' always exists, this node should be compatible with SD and XL.
 
             # In case they are using SD 2.1, 768 ?  It's contained in 'h' layer
-            base_block = 'l'
         
             if 'h' in temp_tokens:
                 base_block = 'h'
