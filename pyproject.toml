@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-shinsplat"
+description = "Nodes: Clip Text Encode (Shinsplat), Clip Text Encode SDXL (Shinsplat), Lora Loader (Shinsplat)."
+version = "1.0.0"
+license = "LICENSE"
+
+[project.urls]
+Repository = "https://github.com/Shinsplat/ComfyUI-Shinsplat"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-Shinsplat"
+Icon = ""
