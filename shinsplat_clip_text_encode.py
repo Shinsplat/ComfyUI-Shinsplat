@@ -11,11 +11,11 @@ class Shinsplat_CLIPTextEncode:
     """
     - Shinsplat Tarterbox -
 
-    I didn't write this entirely, I took this simple node from the existing ones in
-    ComfyUI and I altered it to fit my needs.
-    --
-    I attempted to implement the a1111 BREAK directive in ComfyUI, and it kind of works.
-    It doesn't have the desired effect but it does do some interesting and fun things.
+    This adds some directives to the Text Encode nodes.  We can use BREAK directly
+    and it will split up your prompt into different segments.
+
+    There's an END directive that will ignore everything after it, which is a useful
+    tool when you want to just go to the top of your prompt and test something simple.
 
     Since I really needed a token counter I decided to add that to this node so that
     it would at least be somewhat useful.
@@ -27,7 +27,25 @@ class Shinsplat_CLIPTextEncode:
     I also added the ability to prepend the pony score line, which includes the
     expected BREAK.
 
-    There's an END directive that, when used in a prompt, will ignore everything after it.
+    "prompt" - output
+    is a text output that you can deliver to the text input of another node.
+    The usefulness of this for me was that I can have the same prompt in mulitple
+    segments easily.
+
+    Pony tags will not be included in the output text, prompt.  However, the input
+    text "prompt_before" and "prompt_after" will be added to the "prompt".
+
+    For the SDXL with clip_g/l I allowed for the pony score line to be prepended
+    individually for each of these.
+
+    These last two are only for the regular encoder, which of course also works for
+    SDXL models.
+
+    "prompt_before" - input
+    A text input prepended to the existing prompt, but after any pony tags if applicable.
+
+    "prompt_after" - input
+    A text input appended to the existing prompt.
     """
     
     def __init__(self):
@@ -40,26 +58,42 @@ class Shinsplat_CLIPTextEncode:
                 "text": ("STRING", {"multiline": True, "dynamicPrompts": True}),
                 "clip": ("CLIP", ),
                 "pony": ("BOOLEAN", {"default": False}),
-                }
+                },
+            "optional": {
+                        "prompt_before": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
+                        "prompt_after": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
+                        },
             }
 
-    RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING")
-    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "prompt")
+    RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING", )
+    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "prompt", )
 
     FUNCTION = "encode"
 
     CATEGORY = "advanced/Shinsplat"
 
-    def encode(self, clip, text, pony):
+    def encode(self, clip, text, pony=False, prompt_before="", prompt_after=""):
 
         text_raw = text
 
         # This could be 'h' later if using SD 2.1 768 .
         base_block = 'l'
 
+        # I still get pony before the prompt_before, which his what is typically expected.
+        # Also include the raw text output, exposed on "prompt".
+        if prompt_before != "":
+                text = text + " " + prompt_before
+                text_raw = prompt_before + " " + text_raw
+
         # Put the pony stuff in if they wanted it.
+        # Also include the raw text output, exposed on "prompt".
         if pony == True:
                 text = "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, BREAK" + text
+
+        # Append this to everything else.
+        if prompt_after != "":
+                text = text + " " + prompt_after
+                text_raw = text_raw + " " + prompt_after
 
         tokens = dict()
 
@@ -143,7 +177,7 @@ class Shinsplat_CLIPTextEncode:
         try:
             json_loaded
         except:
-            file_name = "tokens.json"
+            file_name = "shinsplat_tokens.json"
             script_path = os.path.dirname(os.path.realpath(__file__))
             file_path = os.path.join(script_path, file_name)
             f = open(file_path, "r", encoding="UTF-8")

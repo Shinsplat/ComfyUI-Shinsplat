@@ -2,7 +2,7 @@
 ComfyUI Node alterations that I found useful in my own projects and for friends.
 
 Clip Text Encoders add functionality like BREAK, END, pony.
-Lora loader extracts metadata and keywords.
+LoRA loader extracts metadata and keywords.
 
 We have a channel in our learning server (Community College) on Discord: https://critters.xyz/sd/
 
@@ -11,7 +11,7 @@ We have a channel in our learning server (Community College) on Discord: https:/
 ## Nodes
 
 - These modified (Clip Text Encode) and (Clip Text Encode SDXL) nodes allows the use of BREAK so you can split up your context, the END directive that allows you to skip all text after, pony features and a prompt counter with token display.
-- This modified (Lora Loader) will automatically extract metadata and potentially read trigger phrases/words.
+- This modified (LoRA Loader) will automatically extract metadata and potentially read trigger phrases/words.
 
 ##	BREAK
 
@@ -48,6 +48,20 @@ We have a channel in our learning server (Community College) on Discord: https:/
 	have access to this.  One might wonder why I didn't just use a text node
 	to begin with and I would nod but also know that the ones I've used do
 	not support filtering comments.
+
+	These last are for the regular encoder, not the advanced one for SDXL, though
+	the regular encoder works for SDXL models as well of course.  I added this
+	for my convenience so that I could more easily pull in my LoRA prompt
+	outputs from my custom LoRA loader, after merging them in some fashion.
+
+    "prompt_before" - input
+    A text input prepended to the existing prompt, but after any pony tags if applicable.
+
+    "prompt_after" - input
+    A text input appended to the existing prompt.
+
+    Pony tags will not be included in the output text, prompt.  However, the input
+    text "prompt_before" and "prompt_after" will be added to the "prompt".
 
 ## END
 
@@ -94,13 +108,13 @@ We have a channel in our learning server (Community College) on Discord: https:/
 	Also note that it doesn't matter where you place directive code, it will
 	be removed and your prompt will be restructured without it.
 
-Lora Loader
+LoRA Loader
 
     When I first started making pictures with SD I didn't realize how important the
     keywords, or "trigger words", would be and neglected to copy them for later use.
     Since then I've amassed quite a few models and was unable to figure out how to
     use them without going back to the source, if I was able to even find it, and
-    get the information from there.  So I copied the lora loader node and added
+    get the information from there.  So I copied the LoRA loader node and added
     some code to it that will examine the header of the safetensor file and
     spit out the key words, or phrases, that were used during training.  There's,
     often times, more key-words/phrases in the header than what was exposed to the
@@ -118,11 +132,45 @@ Lora Loader
 
 ## pass_through
 
-	You can use this to pass the text path from one lora to another.  I use this
-	in order to test different checkpoint models with the same set of loras.
+	You can use this to pass the text path from one LoRA to another.  I use this
+	in order to test different checkpoint models with the same set of LoRAs.
 
-	This probably loads the lora each time it's addressed.  Use the path_out
-	to the path_in of the target loras, then enable pass_through on the target.
+	This probably loads the LoRA each time it's addressed.  Use the path_out
+	to the path_in of the target LoRAs, then enable pass_through on the target.
+
+## weight_clip / weight_model
+
+	These inputs are for strings, even though they will be turned into floats.
+	I used strings because it's easier to manage, and type, and I'm not sure
+	there's a node that's as convenient as text.  You just type your floats in
+	there and the node will convert it, iterate through your floats and stop
+	iterating when the largest set has run out.
+
+	Both model and clip strength are supported.  If one set is smaller than the
+	the other then the smallest will be padded with what is present in the LoRA
+	strength counterpart.  If any input should change the iterator starts over
+	from a clean slate.
+
+	It may be important to understand that the associated LoRA is not loaded
+	multiple times, but must be paired with the associated model in order to
+	tailor the weights for each iteration.  As far as I can tell this is
+	unavoidable because of the way LoRAs work with a model but the short pause
+	isn't as long as loading an initial model and you may just want to set it
+	to run and leave it while you go do other things.
+	
+## prompt_in /  prompt_out
+
+	These, in order, pull in a prompt from a string primitive, saves it to a file
+	located in the LoRA folder where the LoRA is, and can be reused as prompt
+	output to be combined with your other prompt conditioning pipeline.  The
+	data is saved in a plain text file with a new extension (.prompt.txt) .
+
+	If "prompt_in" is hooked up, and there is content, it will overwrite the
+	existing prompt associated with this LoRA, writing it to the text file.
+	Note that this is not trigger data associated with the meta-data, your LoRA
+	is not altered in any way.  This is just a way to automatically load
+	additional prompt words and is convenient if you use the same set of prompt
+	words for some LoRAs.
 
 Sum Wrap
 

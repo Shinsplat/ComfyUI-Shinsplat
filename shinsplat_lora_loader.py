@@ -1,5 +1,6 @@
 # Shinsplat Tarterbox
 
+import os
 import ast
 import json
 import comfy
@@ -11,23 +12,41 @@ class Shinsplat_LoraLoader:
     """
     - Shinsplat Tarterbox -
 
-    I didn't write this entirely, I took this simple node from the existing ones in
-    ComfyUI and I altered it to fit my needs.
-    --
-    When I first started making pictures with SD I didn't realize how important the
-    keywords, or "trigger words", would be and neglected to copy them for later use.
-    Since then I've amassed quite a few models and was unable to figure out how to
-    use them without going back to the source, if I was able to even find it, and
-    get the information from there.  So I copied the lora loader node and added
-    some code to it that will examine the header of the safetensor file and
-    spit out the key words, or phrases, that were used during training.  There's,
-    often times, more key-words/phrases in the header than what was exposed to the
-    general public, which may not be useful at all but I find it interesting to
-    tinker with.
+    - meta data and trigger phrase visual -
+    does not contact civitai, it extracts the data directly from the file.
+
+    - sharing paths between lora loders -
+    pass_through -  when enabled will read the path_out from another of these nodes, or even
+                    a text node, and load the LoRA from that path.
+    path_out     -  a text type used for the path_in of another of these nodes.
+
+    - saving and extracting prompt data associated with a particular lora -
+    prompt_in    -  a text prompt associated with this LoRA that will be saved to a file
+                    a file is created with the lora base name and extension .prompt.txt
+                    if you move your lora file you aught to move this prompt file as well
+    prompt_out   -  a text output associated with this LoRA that will be extracted from a file
+
+    - weight_clip / weight_model -
+    An iterator process that takes text floats as input and sequences through them as floats.
     """
 
     def __init__(self):
         self.loaded_lora = None
+
+        # Shinsplat
+        self.trigger = False
+        self.start = True
+        self.weights = {
+            "model": [],
+            "clip": [],
+        }
+        # If incoming data doesn't match what was saved then it has to be reprocessed.
+        self.backups = {
+            "strength_model": 0.0,
+            "strength_clip": 0.0,
+            "weights_model": "",
+            "weights_clip": "",
+        }
 
     @classmethod
     def INPUT_TYPES(s):
@@ -39,19 +58,126 @@ class Shinsplat_LoraLoader:
                               "pass_through": ("BOOLEAN", {"default": False}),
                              },
                 "optional": {
-                            "path_in": ("STRING", {"multiline": False, "default": "", "forceInput": True}),                
-                            }
+                            #"path_in": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
+                            #"prompt_in": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
+                            #"weight_model": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
+                            #"weight_clip": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
+
+                            "path_in": ("STRING", {"default": "", "forceInput": True}),                
+                            "prompt_in": ("STRING", {"default": "", "forceInput": True}),
+                            "weight_model": ("STRING", {"default": "", "forceInput": True}),
+                            "weight_clip": ("STRING", {"default": "", "forceInput": True}),
+                            },
                 }
 
-    RETURN_TYPES = ("MODEL", "CLIP", "STRING",      "STRING",   "STRING")
-    RETURN_NAMES = ("MODEL", "CLIP", "path_out",    "triggers", "meta")
+    RETURN_TYPES = ("MODEL", "CLIP", "STRING",      "STRING",      "STRING",   "STRING", )
+    RETURN_NAMES = ("MODEL", "CLIP", "path_out",    "prompt_out",  "triggers", "meta")
 
     FUNCTION = "load_lora"
 
     CATEGORY = "advanced/Shinsplat"
 
-    def load_lora(self, model, clip, lora_name, strength_model, strength_clip, pass_through=False, path_in=""):
+    def load_lora(
+        self, model, clip, lora_name, strength_model, strength_clip,
+        pass_through=False, path_in="", prompt_in="", weight_model="", weight_clip=""):
 
+        # If there's anything on the weights line the node has to re-run.
+        weight_clip = weight_clip.strip()
+        weight_model = weight_model.strip()
+
+        # I'll set a flag for later testing.  It tells me if something changed.  It may appear
+        # that this isn't needed, because something changing triggers the node to run but, at
+        # some point, I will make sure the node continues to run, even when something doesn't
+        # change, in order to iterate over the list of floats the node is given.
+        something_changed = False
+        # yea, I could do "or" on all of these but I'm not gunna O.o
+        if self.backups['strength_clip'] != strength_clip:
+            something_changed = True
+        if self.backups['strength_model'] != strength_model:
+            something_changed = True
+        if self.backups['weights_clip'] != weight_clip:
+            something_changed = True
+        if self.backups['weights_model'] != weight_model:
+            something_changed = True
+
+        if something_changed == True:
+            self.start = True
+            if hasattr(self.__class__, 'IS_CHANGED'):
+                delattr(self.__class__, 'IS_CHANGED')
+
+        # If the node is triggered it's because it's a first run or re-run was enabled.
+        # If there's no input then there shouldn't be a trigger.  I don't have to worry
+        # about the strength change, only my own parameters, the strength change will do
+        # its own thing and my added code will conform.
+        if weight_model != "" or weight_clip != "":
+
+            # The node triggers the the test above runs, and I'm here now.  Is it the
+            # first run?
+            if self.start == True:
+                self.start = False
+
+                # Used later in case any input changes.
+                self.backups['strength_clip'] = strength_clip
+                self.backups['strength_model'] = strength_model
+                self.backups['weights_model'] = weight_model
+                self.backups['weights_clip'] = weight_clip
+
+                def IS_CHANGED(self):
+                    self.trigger = not self.trigger
+                    return not self.trigger
+                setattr(self.__class__, 'IS_CHANGED', IS_CHANGED)
+
+                # The longest list of floats will be used for the iterator, the
+                # next list will be padded with the "strength_" of its counterpart
+                # since this code has to run each time anyway.  After the entire
+                # sequence has been exhausted I can I can turn off re-run and allow
+                # the pre-defined weights to drop through, at which point the LoRA
+                # won't have to recondition the model anymore, in case they run over.
+
+                # Convert the float string representations into actual floats.  We
+                # might get int representations and that's fine too.
+                model_string = weight_model.split()
+                clip_string = weight_clip.split()
+                self.weights['model'] = [float(a) for a in model_string]
+                self.weights['clip'] = [float(a) for a in clip_string]
+
+                # Which one is longer?  This portion is inefficient but highly readable.
+                padding_required = False
+                if len(self.weights['model']) > len(self.weights['clip']):
+                    padding_required = True
+                    fill = "clip"
+                    filler = strength_clip
+                if len(self.weights['clip']) > len(self.weights['model']):
+                    padding_required = True
+                    fill = "model"
+                    filler= strength_model
+                if padding_required:
+                    count = abs( len(self.weights['clip']) - len(self.weights['model']) )
+                    print(str(count))
+                    # I know what the target is now, iterate the longest.
+                    for i in range(count):
+                        self.weights[fill].append(filler)
+
+                # Now I'll run out of both at the same time.
+
+                # I'll be popping off the end so reverse the lists.
+                self.weights['model'].reverse()
+                self.weights['clip'].reverse()
+
+        # Here we go, I only need to test one because the length of will should
+        # equal, either when we start or after filling.
+        if len(self.weights['model']):
+            strength_model = self.weights['model'].pop()
+            strength_clip = self.weights['clip'].pop()
+        else:
+            # I've reached the end or the lists were never populated.  Remove
+            # the re-run and reset the start flag.
+            self.start = True
+            if hasattr(self.__class__, 'IS_CHANGED'):
+                delattr(self.__class__, 'IS_CHANGED')
+
+        # This wasn't documented but it's obvious that there's no sense in
+        # running of there's no weights to change.
         if strength_model == 0 and strength_clip == 0:
             return (model, clip)
 
@@ -64,7 +190,6 @@ class Shinsplat_LoraLoader:
             lora_path = path_in
 
         path_out = lora_path
-        # #
 
         lora = None
         if self.loaded_lora is not None:
@@ -80,6 +205,45 @@ class Shinsplat_LoraLoader:
             self.loaded_lora = (lora_path, lora)
 
         model_lora, clip_lora = comfy.sd.load_lora_for_models(model, clip, lora, strength_model, strength_clip)
+
+        # -----------------------------------------------------------------------------
+        # lora prompt start
+        # -----------------------------------------------------------------------------
+
+        # Get the entire path to the lora file but strip off the extension.
+        file_base = os.path.splitext(lora_path)[0]
+        # Add an extension that makes it obvious what it is.
+        prompt_file = file_base + ".prompt.txt"
+
+        # If the prompt_in has content, and it's not just whitespace, it should
+        # be written to the file.
+        prompt_content = prompt_in.strip()
+
+        # If it's empty open the file for reading only.  This works if the input
+        # isn't connected or if the content text box is just whitespace or empty.
+        if prompt_content == "":
+            try:
+                f = open(prompt_file, "r", encoding="utf-8")
+                prompt_content = f.read()
+                f.close()
+            except:
+                print("file", prompt_file, "does not exist")
+        # If there's content on the input then it should always be deposited into
+        # the file.
+        else:
+            try:
+                f = open(prompt_file, "w", encoding="utf-8")
+                f.write(prompt_content)
+                f.close()
+            except:
+                print("shinsplat_lora_loader::prompt file save failed, check folder/file permissions at", prompt_file)
+
+        # The prompt_content already contains what's needed for the prompt_out at this point.
+        prompt_out = prompt_content
+
+        # -----------------------------------------------------------------------------
+        # lora prompt end
+        # -----------------------------------------------------------------------------
 
         # -----------------------------------------------------------------------------
         # get_meta start
@@ -223,7 +387,7 @@ class Shinsplat_LoraLoader:
         # -----------------------------------------------------------------------------
 
         triggers, meta_string = get_meta(lora_path)
-        return (model_lora, clip_lora, path_out, triggers, meta_string)
+        return (model_lora, clip_lora, path_out, prompt_out, triggers, meta_string)
 
 # --------------------------------------------------------------------------------
 #

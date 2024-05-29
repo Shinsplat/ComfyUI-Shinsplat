@@ -10,11 +10,11 @@ class Shinsplat_CLIPTextEncodeSDXL:
     """
     - Shinsplat Tarterbox -
 
-    I didn't write this entirely, I took this simple node from the existing ones in
-    ComfyUI and I altered it to fit my needs.
-    --
-    I attempted to implement the a1111 BREAK directive in ComfyUI, and it kind of works.
-    It doesn't have the desired effect but it does do some interesting and fun things.
+    This adds some directives to the Text Encode nodes.  We can use BREAK directly
+    and it will split up your prompt into different segments.
+
+    There's an END directive that will ignore everything after it, which is a useful
+    tool when you want to just go to the top of your prompt and test something simple.
 
     Since I really needed a token counter I decided to add that to this node so that
     it would at least be somewhat useful.
@@ -25,8 +25,6 @@ class Shinsplat_CLIPTextEncodeSDXL:
 
     I also added the ability to prepend the pony score line, which includes the
     expected BREAK.
-
-    There's an END directive that, when used in a prompt, will ignore everything after it.
 
     For the SDXL with clip_g/l I allowed for the pony score line to be prepended
     individually for each of these.
@@ -166,7 +164,7 @@ class Shinsplat_CLIPTextEncodeSDXL:
         try:
             json_loaded
         except:
-            file_name = "tokens.json"
+            file_name = "shinsplat_tokens.json"
             script_path = os.path.dirname(os.path.realpath(__file__))
             file_path = os.path.join(script_path, file_name)
             f = open(file_path, "r", encoding="UTF-8")
