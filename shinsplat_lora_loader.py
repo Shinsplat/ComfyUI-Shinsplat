@@ -58,11 +58,6 @@ class Shinsplat_LoraLoader:
                               "pass_through": ("BOOLEAN", {"default": False}),
                              },
                 "optional": {
-                            #"path_in": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
-                            #"prompt_in": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-                            #"weight_model": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-                            #"weight_clip": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
-
                             "path_in": ("STRING", {"default": "", "forceInput": True}),                
                             "prompt_in": ("STRING", {"default": "", "forceInput": True}),
                             "weight_model": ("STRING", {"default": "", "forceInput": True}),
