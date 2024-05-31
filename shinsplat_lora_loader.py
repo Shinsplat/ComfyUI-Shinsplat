@@ -222,7 +222,7 @@ class Shinsplat_LoraLoader:
                 prompt_content = f.read()
                 f.close()
             except:
-                print("file", prompt_file, "does not exist")
+                pass
         # If there's content on the input then it should always be deposited into
         # the file.
         else:
