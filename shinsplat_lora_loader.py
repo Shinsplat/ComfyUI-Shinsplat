@@ -333,7 +333,7 @@ class Shinsplat_LoraLoader:
                             # add this phrase to its count key
                             phrases[phrase_key][count].append(phrase)
                 else:
-                    print("shinsplat:lora_loader::get_meta reports - no usable metadata")
+                    # no usable metadata
                     return(triggers, meta_string)
 
                 del meta_dict
