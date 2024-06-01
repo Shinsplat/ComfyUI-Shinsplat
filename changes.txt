@@ -1,0 +1,3 @@
+shinsplat_clip_text_encode
+	6/1/2024
+	updated to be compatible with Cascade
