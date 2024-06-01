@@ -77,6 +77,8 @@ class Shinsplat_CLIPTextEncode:
         text_raw = text
 
         # This could be 'h' later if using SD 2.1 768 .
+        # This will not exist in Cascade.  I'll change this
+        # below, if needed, after getting the tokens.
         base_block = 'l'
 
         # I still get pony before the prompt_before, which his what is typically expected.
@@ -109,13 +111,17 @@ class Shinsplat_CLIPTextEncode:
             if len(block.strip()) == 0:
                 continue
             temp_tokens = clip.tokenize(block)
+
+            if "l" not in temp_tokens and 'h' not in temp_tokens:
+                base_block = "g"
+
             # concatenate each 'l' and 'g' tensor block into the target for return
             #
             # is it XL or SD?
             # 'l' always exists, this node should be compatible with SD and XL.
 
             # In case they are using SD 2.1, 768 ?  It's contained in 'h' layer
-        
+       
             if 'h' in temp_tokens:
                 base_block = 'h'
 
@@ -124,7 +130,8 @@ class Shinsplat_CLIPTextEncode:
                     tokens[base_block] = []
                 for tensor_block in temp_tokens[base_block]:
                     tokens[base_block].append(tensor_block)
-            # 'g' exists in XL models
+
+            # 'g' exists in XL models and Cascade
             if 'g' in temp_tokens:
                 if 'g' not in tokens:
                     tokens['g'] = []
