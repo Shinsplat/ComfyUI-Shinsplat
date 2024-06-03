@@ -172,6 +172,14 @@ LoRA Loader
 	additional prompt words and is convenient if you use the same set of prompt
 	words for some LoRAs.
 
+## tensor_shift / tensor_reverse
+
+    This is not magic and it doesn't do anything predictably useful.  It's just entertaining.
+    Since it doesn't produce garbage I decided to leave these tests in.  They are to shift
+    a tensor by 1024 spaces and reverse the entire 2048 tensor block, respectively.  Each
+    produces different results, the latter often is accompanied by quite a bit of text,
+    watermarks.  There is often some consistent resemblance to what prompt.
+
 Sum Wrap
 
 	An incrementor with a target (ceiling), steps to that target and what to

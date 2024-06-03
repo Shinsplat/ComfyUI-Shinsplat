@@ -119,7 +119,7 @@ class Shinsplat_LoraLoader:
 
                 def IS_CHANGED(self):
                     self.trigger = not self.trigger
-                    return not self.trigger
+                    return self.trigger
                 setattr(self.__class__, 'IS_CHANGED', IS_CHANGED)
 
                 # The longest list of floats will be used for the iterator, the

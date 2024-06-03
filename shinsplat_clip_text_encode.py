@@ -1,8 +1,11 @@
 # Shinsplat Tarterbox
-import json
 import os
 import sys
+import json
 import folder_paths
+
+debug = False
+
 
 # --------------------------------------------------------------------------------
 #
@@ -46,10 +49,30 @@ class Shinsplat_CLIPTextEncode:
 
     "prompt_after" - input
     A text input appended to the existing prompt.
+
+    "tensor_shift / tensor_reverse"
+    This is not magic and it doesn't do anything predictably useful.  It's just entertaining.
+    Since it doesn't produce garbage I decided to leave these tests in.  They are to shift
+    a tensor by 1024 spaces and reverse the entire 2048 tensor block, respectively.  Each
+    produces different results, the latter often is accompanied by quite a bit of text,
+    watermarks.  There is often some consistent resemblance to what prompt.
     """
+
+    def log(self, m):
+        if debug == True:
+            print("===========================================")
+            print(m)
+            print("===========================================")
+            return True
+        return False
     
     def __init__(self):
-        pass
+        self.trigger = False
+        if debug == True:
+            def IS_CHANGED(self):
+                self.trigger = not self.trigger
+                return(self.trigger)
+            setattr(self.__class__, 'IS_CHANGED', IS_CHANGED)
 
     @classmethod
     def INPUT_TYPES(s):
@@ -58,6 +81,8 @@ class Shinsplat_CLIPTextEncode:
                 "text": ("STRING", {"multiline": True, "dynamicPrompts": True}),
                 "clip": ("CLIP", ),
                 "pony": ("BOOLEAN", {"default": False}),
+                "tensor_shift": ("BOOLEAN", {"default": False}),
+                "tensor_reverse": ("BOOLEAN", {"default": False}),
                 },
             "optional": {
                         "prompt_before": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
@@ -72,7 +97,7 @@ class Shinsplat_CLIPTextEncode:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def encode(self, clip, text, pony=False, prompt_before="", prompt_after=""):
+    def encode(self, clip, text, pony=False, tensor_shift=False, tensor_reverse=False, prompt_before="", prompt_after=""):
 
         text_raw = text
 
@@ -105,42 +130,59 @@ class Shinsplat_CLIPTextEncode:
 
         # Split the text into segments using the "BREAK" word as a delimiter, in caps of course.
         text_blocks = start_block.split("BREAK")
-        # Iterate over each block and have the clip encode their 'l' and 'g'.
+
+        # Iterate over each block and have the clip encode their types.
         for block in text_blocks:
             # I won't create an entire block for white-space.
             if len(block.strip()) == 0:
                 continue
             temp_tokens = clip.tokenize(block)
 
-            if "l" not in temp_tokens and 'h' not in temp_tokens:
-                base_block = "g"
-
-            # concatenate each 'l' and 'g' tensor block into the target for return
-            #
-            # is it XL or SD?
-            # 'l' always exists, this node should be compatible with SD and XL.
-
-            # In case they are using SD 2.1, 768 ?  It's contained in 'h' layer
-       
-            if 'h' in temp_tokens:
-                base_block = 'h'
-
-            if base_block in temp_tokens:
-                if base_block not in tokens:
+# New
+            # Depending on the tech temp_tokens will contain 1 or more of the following...
+            # l, g, h.  Cascade uses 'g' only but it won't complain if I toss it an 'l',
+            # it just won't get used.
+            if False:
+                for base_block in temp_tokens:
                     tokens[base_block] = []
-                for tensor_block in temp_tokens[base_block]:
-                    tokens[base_block].append(tensor_block)
+                    for tensor_block in temp_tokens[base_block]:
+                        tokens[base_block].append(tensor_block)
 
-            # 'g' exists in XL models and Cascade
-            if 'g' in temp_tokens:
-                if 'g' not in tokens:
-                    tokens['g'] = []
-                for tensor_block in temp_tokens['g']:
-                    tokens['g'].append(tensor_block)
+# /
+
+            else:
+
+                if "l" not in temp_tokens and 'h' not in temp_tokens:
+                    base_block = "g"
+
+                # concatenate each 'l' and 'g' tensor block into the target for return
+                #
+                # is it XL or SD?
+                # 'l' always exists, this node should be compatible with SD and XL.
+
+                # In case they are using SD 2.1, 768 ?  It's contained in 'h' layer
+           
+                if 'h' in temp_tokens:
+                    base_block = 'h'
+
+                if base_block in temp_tokens:
+                    if base_block not in tokens:
+                        tokens[base_block] = []
+                    for tensor_block in temp_tokens[base_block]:
+                        tokens[base_block].append(tensor_block)
+
+                # 'g' exists in XL models and Cascade
+                if 'g' in temp_tokens:
+                    if 'g' not in tokens:
+                        tokens['g'] = []
+                    for tensor_block in temp_tokens['g']:
+                        tokens['g'].append(tensor_block)
+
 
         # If I didn't get any good tokens then this will pose a problem,
         # just default to what it would normally do.
         if len(tokens) == 0:
+            self.log("no tokens")
             #tokens = clip.tokenize(text)
             tokens = clip.tokenize(start_block)
 
@@ -220,6 +262,45 @@ class Shinsplat_CLIPTextEncode:
                     tokens_used += word + " "
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
+
+
+        # Reverse or shift the tensors.  It's just a fun visual to watch, you don't
+        # know what you'll get but it's not junk.
+        if tensor_reverse:
+            self.log("tensor_reverse")
+            tb_count = 0
+            for tb in cond:
+                t_count = 0
+                for t in tb:
+                    # I don't know the methods in a tensor in order to reverse
+                    # so I'll pass it to a list first and put it all back float
+                    # by float.
+                    floats_list = [a for a in t]
+                    floats_list.reverse()
+                    f_count = 0
+                    for f in floats_list:
+                        cond[tb_count][t_count][f_count] = f
+                        f_count += 1
+                    t_count += 1
+                tb_count += 1
+        if tensor_shift:
+            self.log("tensor_shift enabled")
+            tb_count = 0
+            for tb in cond:
+                t_count = 0
+                for t in tb:
+                    # I have the tensor list for this block in t, because this is
+                    # greater than 0 I'll pop tensor_shift floats off the end.
+                    float_list = [a for a in t]
+                    for i in range(1024):
+                        float_list.insert(len(float_list) + 1, float_list.pop(0))
+                    # put it all back
+                    f_count = 0
+                    for f in float_list:
+                        cond[tb_count][t_count][f_count] = f
+                        f_count += 1
+                    t_count += 1
+                tb_count += 1
 
         return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, text_raw)
 # --------------------------------------------------------------------------------

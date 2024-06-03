@@ -1,3 +1,7 @@
 shinsplat_clip_text_encode
+	6/2/2024
+		I added a couple of switches to improve my entertainment value,
+		they shift the tensor weights and reverse them.  The results
+		are not unpleasnt.
 	6/1/2024
-	updated to be compatible with Cascade
+		updated to be compatible with Cascade
