@@ -4,7 +4,7 @@ import sys
 import json
 import folder_paths
 
-debug = True
+debug = False
 
 
 # --------------------------------------------------------------------------------
