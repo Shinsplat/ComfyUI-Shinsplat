@@ -4,9 +4,6 @@ import sys
 import json
 import folder_paths
 
-debug = False
-
-
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
@@ -64,23 +61,36 @@ class Shinsplat_CLIPTextEncode:
     else, each with different lengths of tensors it seams.  The clip and pool weights will be
     shifted by half of their length, which is the only value that seems to provide
     a visual that isn't garbage, and the invert method will just flip the array's of each.
+
+    DEBUG - directive
+    self.debug = True # Releases the print
+    WEIGHTS - directive
+    self.show_weights = True # Shows the token weights
     """
 
-    def log(self, m):
-        if debug == True:
+    def log(self, m,  **kwargs):
+        if self.debug == True:
+            if self.show_weights == True:
+                if 'tokens' in kwargs:
+                    tokens = kwargs['tokens']
+                    txt = ""
+                    for tensor_type in tokens:
+                        for block in tokens[tensor_type]:
+                            #txt += str(tokens[tensor_type][block]) + "\n"
+                            txt += str(block) + "\n"
+                    m += "\n" + txt
             print("===========================================")
             print(m)
             print("===========================================")
+            self.debug = False
+            self.show_weights = False
             return True
         return False
-    
+
     def __init__(self):
+        self.debug = False
+        self.show_weights = False
         self.trigger = False
-        if debug == True:
-            def IS_CHANGED(self):
-                self.trigger = not self.trigger
-                return(self.trigger)
-            setattr(self.__class__, 'IS_CHANGED', IS_CHANGED)
 
     @classmethod
     def INPUT_TYPES(s):
@@ -135,12 +145,42 @@ class Shinsplat_CLIPTextEncode:
         start_block = text.split("END")[0]
 
         # ------------------------------------------------------------------------
+        # debug
+        # ------------------------------------------------------------------------
+        if 'DEBUG' in start_block:
+            print("got DEBUG")
+            self.debug = True
+        if 'WEIGHTS' in start_block:
+            print("got WEIGHTS")
+            self.show_weights = True
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+        # generic
+        # ------------------------------------------------------------------------
+        # used later in order to remove the directives so that they are not
+        # evaluated or pushed out through the prompt.
+        remove_directives = {'CLIP_INVERT', 'POOL_INVERT', 'CLIP_SHIFT', 'POOL_SHIFT', 'DEBUG', 'WEIGHTS'}
+        if self.debug == True:
+            def IS_CHANGED(self):
+                self.trigger = not self.trigger
+                return(self.trigger)
+            setattr(self.__class__, 'IS_CHANGED', IS_CHANGED)
+        else:
+            if hasattr(self.__class__, 'IS_CHANGED'):
+                delattr(self.__class__, 'IS_CHANGED')
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
         # tensor manipulation
         # ------------------------------------------------------------------------
         # These items are for goofing with some data, it doesn't appear to produce any significant value
         # except for entertainment.  If any of these keywords can see in the "prompt" output then you
         # typed them in wrong, unless it's a bug of course.
-        remove_types = {'CLIP_INVERT', 'POOL_INVERT', 'CLIP_SHIFT', 'POOL_SHIFT'}
         clip_invert = False
         pool_invert = False
         clip_shift = False
@@ -155,7 +195,7 @@ class Shinsplat_CLIPTextEncode:
             pool_shift = True
         # Remove the directives from the block and the raw text so that it doesn't
         # get interpreted or travel to the next node.
-        for t in remove_types:
+        for t in remove_directives:
             start_block = start_block.replace(t, "")
             text_raw = text_raw.replace(t, "")
         # ------------------------------------------------------------------------
@@ -301,13 +341,16 @@ class Shinsplat_CLIPTextEncode:
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
 
+        # debug
+        self.log("weights:\n", tokens=tokens)
+
         # ------------------------------------------------------------------------
         # tensor manipulation
         # ------------------------------------------------------------------------
         # Reverse or shift the tensors.  It's just a fun visual to watch, you don't
         # know what you'll get but it hasn't bee completely useless.
         if clip_invert:
-            self.log("clip_invert")
+            self.log("clip_invert - enabled")
             tb_count = 0
             for tb in cond:
                 t_count = 0
@@ -325,7 +368,7 @@ class Shinsplat_CLIPTextEncode:
                 tb_count += 1
         # pool
         if pool_invert:
-            self.log("pool_invert")
+            self.log("pool_invert - enabled")
             tp_count = 0
             for tp in pooled:
                 pooled_list = [a for a in tp]
@@ -336,7 +379,7 @@ class Shinsplat_CLIPTextEncode:
                     f_count += 1
                 tp_count += 1
         if clip_shift:
-            self.log("clip_shift")
+            self.log("clip_shift - enabled")
             tb_count = 0
             for tb in cond:
                 t_count = 0
@@ -355,7 +398,7 @@ class Shinsplat_CLIPTextEncode:
                     t_count += 1
                 tb_count += 1
         if pool_shift:
-            self.log("pool_shift")
+            self.log("pool_shift - enabled")
             tp_count = 0
             for tp in pooled:
                 float_list = [a for a in tp]
