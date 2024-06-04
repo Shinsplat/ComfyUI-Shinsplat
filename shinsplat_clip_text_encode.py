@@ -105,32 +105,6 @@ class Shinsplat_CLIPTextEncode:
 
     def encode(self, clip, text, pony=False, prompt_before="", prompt_after=""):
 
-        # ------------------------------------------------------------------------
-        # tensor manipulation
-        # ------------------------------------------------------------------------
-        # These items are for goofing with some data, it doesn't appear to produce any significant value
-        # except for entertainment.  If any of these keywords can see in the "prompt" output then you
-        # typed them in wrong, unless it's a bug of course.
-        clip_invert = False
-        pool_invert = False
-        clip_shift = False
-        pool_shift = False
-        if 'CLIP_INVERT' in text:
-            clip_invert = True
-            text = text.replace("CLIP_INVERT", "")
-        if 'POOL_INVERT' in text:
-            pool_invert = True
-            text = text.replace("POOL_INVERT", "")
-        if 'CLIP_SHIFT' in text:
-            clip_shift = True
-            text = text.replace("CLIP_SHIFT", "")
-        if 'POOL_SHIFT' in text:
-            pool_shift = True
-            text = text.replace("POOL_SHIFT", "")
-        # ------------------------------------------------------------------------
-        #
-        # ------------------------------------------------------------------------
-
         text_raw = text
 
         # This could be 'h' later if using SD 2.1 768 .
@@ -159,6 +133,34 @@ class Shinsplat_CLIPTextEncode:
         # See if there's an "END" directive first.  It's only useful a single time so take the first one
         # and ignore the rest.
         start_block = text.split("END")[0]
+
+        # ------------------------------------------------------------------------
+        # tensor manipulation
+        # ------------------------------------------------------------------------
+        # These items are for goofing with some data, it doesn't appear to produce any significant value
+        # except for entertainment.  If any of these keywords can see in the "prompt" output then you
+        # typed them in wrong, unless it's a bug of course.
+        remove_types = {'CLIP_INVERT', 'POOL_INVERT', 'CLIP_SHIFT', 'POOL_SHIFT'}
+        clip_invert = False
+        pool_invert = False
+        clip_shift = False
+        pool_shift = False
+        if 'CLIP_INVERT' in start_block:
+            clip_invert = True
+        if 'POOL_INVERT' in start_block:
+            pool_invert = True
+        if 'CLIP_SHIFT' in start_block:
+            clip_shift = True
+        if 'POOL_SHIFT' in start_block:
+            pool_shift = True
+        # Remove the directives from the block and the raw text so that it doesn't
+        # get interpreted or travel to the next node.
+        for t in remove_types:
+            start_block = start_block.replace(t, "")
+            text_raw = text_raw.replace(t, "")
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
 
         # Split the text into segments using the "BREAK" word as a delimiter, in caps of course.
         text_blocks = start_block.split("BREAK")
