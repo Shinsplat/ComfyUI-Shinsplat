@@ -1,7 +1,18 @@
 shinsplat_clip_text_encode
+
 	6/2/2024
 		I added a couple of switches to improve my entertainment value,
 		they shift the tensor weights and reverse them.  The results
 		are not unpleasnt.
+
+		And on this same day I turned these switches into directives
+		because I didn't like the clutter.
+
+		CLIP_INVERT
+		POOL_INVERT
+		CLIP_SHIFT
+		POOL_SHIFT
+
 	6/1/2024
 		updated to be compatible with Cascade
+
