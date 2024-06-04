@@ -108,6 +108,21 @@ We have a channel in our learning server (Community College) on Discord: https:/
 	Also note that it doesn't matter where you place directive code, it will
 	be removed and your prompt will be restructured without it.
 
+## CLIP_INVERT / POOL_INVERT / CLIP_SHIFT / POOL_SHIFT
+
+    I'm having some fun goofing with the data, these just do a bit of fiddling with
+    the return values of tensors.  How I manipulate them probably isn't important
+    and certainly doesn't seem to produce any practical results so this is just for
+    entertainment.
+
+    There are two blocks returned, cond seems to be the clip side and pool is something
+    else, each with different lengths of tensors it seams.  The clip and pool weights will be
+    shifted by half of their length, which is the only value that seems to provide
+    a visual that isn't garbage, and the invert method will just flip the array's of each.
+
+	Check the "prompt" output to see if these key phrases are present and, if any of
+	them are, then they were type in wrong unless there's a bug.
+
 LoRA Loader
 
     When I first started making pictures with SD I didn't realize how important the
@@ -171,14 +186,6 @@ LoRA Loader
 	is not altered in any way.  This is just a way to automatically load
 	additional prompt words and is convenient if you use the same set of prompt
 	words for some LoRAs.
-
-## tensor_shift / tensor_reverse
-
-    This is not magic and it doesn't do anything predictably useful.  It's just entertaining.
-    Since it doesn't produce garbage I decided to leave these tests in.  They are to shift
-    a tensor by 1024 spaces and reverse the entire 2048 tensor block, respectively.  Each
-    produces different results, the latter often is accompanied by quite a bit of text,
-    watermarks.  There is often some consistent resemblance to what prompt.
 
 Sum Wrap
 
