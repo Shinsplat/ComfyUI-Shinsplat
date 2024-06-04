@@ -4,7 +4,8 @@ ComfyUI Node alterations that I found useful in my own projects and for friends.
 Clip Text Encoders add functionality like BREAK, END, pony.
 LoRA loader extracts metadata and keywords.
 
-We have a channel in our learning server (Community College) on Discord: https://critters.xyz/sd/
+If you wanna hand and make words, or you have a bug report, here's where to find me...
+https://shinsplat.com/sd/
 
 # :wrench: ComfyUI Convenience Nodes
 
