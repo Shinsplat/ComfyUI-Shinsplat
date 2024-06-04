@@ -4,7 +4,7 @@ import sys
 import json
 import folder_paths
 
-debug = False
+debug = True
 
 
 # --------------------------------------------------------------------------------
@@ -27,8 +27,12 @@ class Shinsplat_CLIPTextEncode:
     associated words from the token numbers.  This will display the word tokens that
     where inferred.
 
+    "BREAK" - directive
     I also added the ability to prepend the pony score line, which includes the
     expected BREAK.
+
+    "END" - directive
+    When this is encountered nothing after it will be conditioned.
 
     "prompt" - output
     is a text output that you can deliver to the text input of another node.
@@ -50,12 +54,16 @@ class Shinsplat_CLIPTextEncode:
     "prompt_after" - input
     A text input appended to the existing prompt.
 
-    "tensor_shift / tensor_reverse"
-    This is not magic and it doesn't do anything predictably useful.  It's just entertaining.
-    Since it doesn't produce garbage I decided to leave these tests in.  They are to shift
-    a tensor by 1024 spaces and reverse the entire 2048 tensor block, respectively.  Each
-    produces different results, the latter often is accompanied by quite a bit of text,
-    watermarks.  There is often some consistent resemblance to what prompt.
+    "CLIP_INVERT / POOL_INVERT / CLIP_SHIFT / POOL_SHIFT" - directive
+    I'm having some fun goofing with the data, these just do a bit of fiddling with
+    the return values of tensors.  How I manipulate them probably isn't important
+    and certainly doesn't seem to produce any practical results so this is just for
+    entertainment.
+
+    There are two blocks returned, cond seems to be the clip side and pool is something
+    else, each with different lengths of tensors it seams.  The clip and pool weights will be
+    shifted by half of their length, which is the only value that seems to provide
+    a visual that isn't garbage, and the invert method will just flip the array's of each.
     """
 
     def log(self, m):
@@ -81,8 +89,6 @@ class Shinsplat_CLIPTextEncode:
                 "text": ("STRING", {"multiline": True, "dynamicPrompts": True}),
                 "clip": ("CLIP", ),
                 "pony": ("BOOLEAN", {"default": False}),
-                "tensor_shift": ("BOOLEAN", {"default": False}),
-                "tensor_reverse": ("BOOLEAN", {"default": False}),
                 },
             "optional": {
                         "prompt_before": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
@@ -97,7 +103,33 @@ class Shinsplat_CLIPTextEncode:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def encode(self, clip, text, pony=False, tensor_shift=False, tensor_reverse=False, prompt_before="", prompt_after=""):
+    def encode(self, clip, text, pony=False, prompt_before="", prompt_after=""):
+
+        # ------------------------------------------------------------------------
+        # tensor manipulation
+        # ------------------------------------------------------------------------
+        # These items are for goofing with some data, it doesn't appear to produce any significant value
+        # except for entertainment.  If any of these keywords can see in the "prompt" output then you
+        # typed them in wrong, unless it's a bug of course.
+        clip_invert = False
+        pool_invert = False
+        clip_shift = False
+        pool_shift = False
+        if 'CLIP_INVERT' in text:
+            clip_invert = True
+            text = text.replace("CLIP_INVERT", "")
+        if 'POOL_INVERT' in text:
+            pool_invert = True
+            text = text.replace("POOL_INVERT", "")
+        if 'CLIP_SHIFT' in text:
+            clip_shift = True
+            text = text.replace("CLIP_SHIFT", "")
+        if 'POOL_SHIFT' in text:
+            pool_shift = True
+            text = text.replace("POOL_SHIFT", "")
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
 
         text_raw = text
 
@@ -139,6 +171,10 @@ class Shinsplat_CLIPTextEncode:
             temp_tokens = clip.tokenize(block)
 
 # New
+            # UPDATE: 6/3/2024 - I'll get back to this later, it's supposed to make things
+            # easier to maintain.  I'll be iterating over the types instead of asking what
+            # they are.  This should partially future proof it.
+
             # Depending on the tech temp_tokens will contain 1 or more of the following...
             # l, g, h.  Cascade uses 'g' only but it won't complain if I toss it an 'l',
             # it just won't get used.
@@ -263,11 +299,13 @@ class Shinsplat_CLIPTextEncode:
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
 
-
+        # ------------------------------------------------------------------------
+        # tensor manipulation
+        # ------------------------------------------------------------------------
         # Reverse or shift the tensors.  It's just a fun visual to watch, you don't
-        # know what you'll get but it's not junk.
-        if tensor_reverse:
-            self.log("tensor_reverse")
+        # know what you'll get but it hasn't bee completely useless.
+        if clip_invert:
+            self.log("clip_invert")
             tb_count = 0
             for tb in cond:
                 t_count = 0
@@ -283,8 +321,20 @@ class Shinsplat_CLIPTextEncode:
                         f_count += 1
                     t_count += 1
                 tb_count += 1
-        if tensor_shift:
-            self.log("tensor_shift enabled")
+        # pool
+        if pool_invert:
+            self.log("pool_invert")
+            tp_count = 0
+            for tp in pooled:
+                pooled_list = [a for a in tp]
+                pooled_list.reverse()
+                f_count = 0
+                for f in tp:
+                    pooled[tp_count][f_count] = pooled_list[f_count]
+                    f_count += 1
+                tp_count += 1
+        if clip_shift:
+            self.log("clip_shift")
             tb_count = 0
             for tb in cond:
                 t_count = 0
@@ -292,7 +342,8 @@ class Shinsplat_CLIPTextEncode:
                     # I have the tensor list for this block in t, because this is
                     # greater than 0 I'll pop tensor_shift floats off the end.
                     float_list = [a for a in t]
-                    for i in range(1024):
+                    clip_half = int( len(float_list) / 2 )
+                    for i in range(clip_half):
                         float_list.insert(len(float_list) + 1, float_list.pop(0))
                     # put it all back
                     f_count = 0
@@ -301,8 +352,25 @@ class Shinsplat_CLIPTextEncode:
                         f_count += 1
                     t_count += 1
                 tb_count += 1
+        if pool_shift:
+            self.log("pool_shift")
+            tp_count = 0
+            for tp in pooled:
+                float_list = [a for a in tp]
+                pool_half =  int( len(float_list) / 2 )
+                for i in range(pool_half):
+                    float_list.insert(len(float_list) + 1, float_list.pop(0))
+                f_count = 0
+                for f in tp:
+                    pooled[tp_count][f_count] = float_list[f_count]
+                    f_count += 1
+                tp_count += 1
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
 
         return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, text_raw)
+
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
