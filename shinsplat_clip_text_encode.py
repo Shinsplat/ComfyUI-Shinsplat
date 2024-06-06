@@ -106,8 +106,8 @@ class Shinsplat_CLIPTextEncode:
                         },
             }
 
-    RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING", )
-    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "prompt", )
+    RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING",       "STRING", )
+    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "tokens_raw",   "prompt_out", )
 
     FUNCTION = "encode"
 
@@ -115,7 +115,32 @@ class Shinsplat_CLIPTextEncode:
 
     def encode(self, clip, text, pony=False, prompt_before="", prompt_after=""):
 
-        text_raw = text
+        # ------------------------------------------------------------------------
+        # load tokens
+        # ------------------------------------------------------------------------
+        # Get the actual words that were identified as tokens.  I'm always going
+        # to need this so may as well do it right away.
+        #
+        # Load the tokens file if it's not already in memory...
+        file_name = "shinsplat_tokens.json"
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        file_path = os.path.join(script_path, file_name)
+        f = open(file_path, "r", encoding="UTF-8")
+        sdata = f.read()
+        f.close()
+        # This is the forward lookup, I'll need the reverse.
+        tokens_forward = json.loads(sdata)
+        del f
+        del sdata
+        tokens_dict = {}
+        for key in tokens_forward:
+            value = tokens_forward[key]
+            tokens_dict[value] = key
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+
+        prompt_out = text
 
         # This could be 'h' later if using SD 2.1 768 .
         # This will not exist in Cascade.  I'll change this
@@ -125,8 +150,9 @@ class Shinsplat_CLIPTextEncode:
         # I still get pony before the prompt_before, which his what is typically expected.
         # Also include the raw text output, exposed on "prompt".
         if prompt_before != "":
-                text = text + " " + prompt_before
-                text_raw = prompt_before + " " + text_raw
+                #text = text + " " + prompt_before
+                text = prompt_before + " " + text
+                prompt_out = prompt_before + " " + prompt_out
 
         # Put the pony stuff in if they wanted it.
         # Also include the raw text output, exposed on "prompt".
@@ -136,7 +162,7 @@ class Shinsplat_CLIPTextEncode:
         # Append this to everything else.
         if prompt_after != "":
                 text = text + " " + prompt_after
-                text_raw = text_raw + " " + prompt_after
+                prompt_out = prompt_out + " " + prompt_after
 
         tokens = dict()
 
@@ -162,7 +188,10 @@ class Shinsplat_CLIPTextEncode:
         # ------------------------------------------------------------------------
         # used later in order to remove the directives so that they are not
         # evaluated or pushed out through the prompt.
-        remove_directives = {'CLIP_INVERT', 'POOL_INVERT', 'CLIP_SHIFT', 'POOL_SHIFT', 'DEBUG', 'WEIGHTS'}
+        remove_directives = {
+            'CLIP_INVERT', 'POOL_INVERT', 'CLIP_SHIFT', 'POOL_SHIFT',
+            'DEBUG', 'WEIGHTS', 'STRING_TOKENS', 'NUMBER_TOKENS', 'CLEAN'}
+
         if self.debug == True:
             def IS_CHANGED(self):
                 self.trigger = not self.trigger
@@ -193,11 +222,23 @@ class Shinsplat_CLIPTextEncode:
             clip_shift = True
         if 'POOL_SHIFT' in start_block:
             pool_shift = True
+
+        # Only 1 of these will be utilized, and that will be the first one in this test, in case both
+        # directives are included in the prompt.
+        #
+        # This one allows for raw string tokens instead of words.
+        tokens_input = ""
+        if 'STRING_TOKENS' in start_block:
+            tokens_input = 'STRING'
+        # This one allows for raw integer tokens instead of words.
+        if 'NUMBER_TOKENS' in start_block:
+            tokens_input = 'NUMBER'
+
         # Remove the directives from the block and the raw text so that it doesn't
         # get interpreted or travel to the next node.
         for t in remove_directives:
             start_block = start_block.replace(t, "")
-            text_raw = text_raw.replace(t, "")
+            prompt_out = prompt_out.replace(t, "")
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
@@ -256,6 +297,68 @@ class Shinsplat_CLIPTextEncode:
                     for tensor_block in temp_tokens['g']:
                         tokens['g'].append(tensor_block)
 
+        # ------------------------------------------------------------------------
+        # raw tokens parsing
+        # ------------------------------------------------------------------------
+        # This is not related to "raw tokens output".
+        #
+        # Rather than adjust code that already works, and possibly breaking it with
+        # additional code, I chose a less efficient method to add, or alter, the
+        # previous method if conditions were just so.
+        #
+        # At this point I have tokens properly organized but if I'm processing
+        # raw tokens then I'll trash all of that and rebuild it.
+        #
+        # If tokens_input is not an empty string then I need an empty token container
+        # for the clip type.
+
+# working on it !
+
+        if tokens_input != "":
+            self.log("raw tokens input:" + tokens_input)
+            # Iterate over each block and have the clip encode their types.  These
+            # have already been broken up with the BREAK directive but in this process
+            # I'll have to actually count the tokens and create additional blocks,
+            # within a block, if it runs over.  We get 75 tokens and then I add the
+            # start and stop values.  To easily get the start and stop values of a
+            # token type I can issue an empty string to the tokenizer and it will
+            # return a block of 77 per type, of which the first two elements in each
+            # block (list) will be start and stop respectively.
+            start_end = clip.tokenize("")
+            end_tokens = {}
+            for t in start_end:
+                end_tokens[t] = {"start": 0, "stop": 0,}
+                end_tokens[t]['start'] =  start_end[t][0][0][0]
+                end_tokens[t]['stop'] =  start_end[t][0][0][1]
+            # Now I have start and stop tokens for this model type.  I'll free up
+            # the list
+            del start_end
+            for block in text_blocks:
+                # I won't create an entire block for white-space.
+                if len(block.strip()) == 0:
+                    continue
+                # For each of these blocks I have to observe the request for BREAK, but
+                # also have to make sure that each block fits into a tensor block, which
+                # is 77 tokens, two of those are end tokens so are not evaluated.  That
+                # means that I have to make sure I have 75 tokens or less per segment
+                # that I generate.  In order to achieve that I'll first remove all words
+                # that don't exist in the vocab, evaluate what's left, and generate the
+                # data needed.
+                split_words = block.split()
+                good_words = []
+
+                print("===========================================")
+                print("split_words:\n", split_words)
+                print("===========================================")
+
+
+#                temp_tokens = clip.tokenize("")
+
+# ########
+
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
 
         # If I didn't get any good tokens then this will pose a problem,
         # just default to what it would normally do.
@@ -297,29 +400,13 @@ class Shinsplat_CLIPTextEncode:
             token_count = 0 # reset for next iter
             tokens_count += "    End Token: " + str(last_token) + "\n"
 
-        # Get the actual words that were identified as tokens.  I only need to iterate the 'l' here,
-        # in the XL version I'll do both 'l' and 'g'.
-        #
-        # Load the tokens file if it's not already in memory...
-        try:
-            json_loaded
-        except:
-            file_name = "shinsplat_tokens.json"
-            script_path = os.path.dirname(os.path.realpath(__file__))
-            file_path = os.path.join(script_path, file_name)
-            f = open(file_path, "r", encoding="UTF-8")
-            sdata = f.read()
-            f.close()
-            # This is the forward lookup, I'll need the reverse.
-            tokens_fwd = json.loads(sdata)
-            del f
-            del sdata
-            tokens_dict = {}
-            for key in tokens_fwd:
-                value = tokens_fwd[key]
-                tokens_dict[value] = key
-            del tokens_fwd
-            json_loaded = True
+
+
+
+
+
+
+
 
         # Pull out the token words using the integer.
         tokens_used = ""
@@ -414,7 +501,44 @@ class Shinsplat_CLIPTextEncode:
         #
         # ------------------------------------------------------------------------
 
-        return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, text_raw)
+        # ------------------------------------------------------------------------
+        # raw tokens output
+        # ------------------------------------------------------------------------
+        tokens_raw = ""
+        token_type = ""
+        # I only need one set of tokens for this encoder, that can be 'l',
+        # I'll first look for 'l', because it will have the proper end token,
+        # then 'h', then 'g'.  I figure 'h' probably has an end token since
+        # it's alone but I haven't tested that yet.
+        if 'l' in tokens:
+            token_type = 'l'
+        elif 'h' in tokens:
+            token_type = 'h'
+        elif 'g' in tokens:
+            token_type = 'g'
+        else:
+            self.log("no token type found")
+        if token_type != "":
+            # Each block is a list of tuples, each tuple contains the encoded token
+            # and then its weight value (float).
+            for block in tokens[token_type]:
+                for tensor_pair in block:
+                    (t, w) = tensor_pair
+                    # There is a start (49406) and end (49407) token identifier,
+                    # I want everything in between but not those.
+                    if t == 49406:
+                        continue
+                    if t == 49407:
+                        break
+                    # Get the string token associated with this token value.
+                    token_value = tokens_dict[t]
+                    tokens_raw += "(" + token_value + ":" + str(t) + ":" + str(w) + ") "
+
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+
+        return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_raw, prompt_out)
 
 # --------------------------------------------------------------------------------
 #

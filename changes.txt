@@ -1,5 +1,8 @@
 shinsplat_clip_text_encode
 
+	6/6/2024
+		The prompt_before wasn't working properly, should be fixed now.
+
 	6/2/2024
 		I added a couple of switches to improve my entertainment value,
 		they shift the tensor weights and reverse them.  The results
