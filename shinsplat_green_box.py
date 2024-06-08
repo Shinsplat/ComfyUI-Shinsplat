@@ -129,8 +129,8 @@ class Shinsplat_GreenBox:
     def select(self, text="", loop=False, enabled=True, chain="", start_over=False):
 
         # Set the node's global
-        clean = start_over
-        if clean == True:
+        self.clean = start_over
+        if self.clean == True:
             self.start = True
             return(str([]), "", help)
 
@@ -141,7 +141,7 @@ class Shinsplat_GreenBox:
             self.start = True
             self.prompts = []
             # return chain, text_out and help
-            return ("", "", help)
+            return (str([]), "", help)
 
         # Even if disabled I still want to pass "chain" along.
         chains = []
@@ -151,8 +151,10 @@ class Shinsplat_GreenBox:
         if enabled == False:
             self.start = True
             self.prompts = []
+            prompt = " ".join(chains)
             # return chain, text_out and help
-            return (str(chains), "", help)
+            return (str(chains), prompt, help)
+
 
         # First run?
         if self.start == True:
