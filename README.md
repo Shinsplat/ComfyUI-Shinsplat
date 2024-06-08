@@ -216,7 +216,18 @@ Green Box
 	The loop option will start that node from the top after it runs out of prompts,
 	the "enabled" can be disabled so that this prompt doesn't function but it will
 	still pass the "chain" and "start_over", when True, will set the start bit to
-	True so that all nodes start from the top.
+	True so that the node can start from the beginning of the prompt list.
 
+Python
 
+	A very simple node that I was unable to find from day one, so I made it.  It's
+	just a way to manipulate data incoming and outgoing.  Just type in your python
+	in the text box, manipulating any of the inputs and send the result to the
+	outputs or not even that, you can perform any local task even file manipulation,
+	loading, saving, etc.  This is dangerous for the person that's uninitiated and
+	is feeling the power of Python, you can delete files and wreck your system.  If
+	you're a Python person, or code in any way at all, then you already know this.
+	If you're not, here's your sign!
+
+	import numpy as np # yes, you can do this
 
