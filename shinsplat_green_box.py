@@ -6,6 +6,8 @@ import traceback
 
 debug = True
 
+clean = False
+
 help = """
 
 You'll need to format your prompt(s) a certain way for them to be added as a list.
@@ -81,13 +83,10 @@ class Shinsplat_GreenBox:
     it runs out of prompts.
 
     - start_over -
-    This switch effects all nodes and will force your iterations to start from the
-    beginning.  After a single run, with this enabled, switch it back off or you'll
-    get only the first prompt of each chained node.
+    This will reset the node data and start from the beginning.  I've chosen to keep
+    this local, instead of affecting all of the nodes, since it's the most logical
+    and easier path.
     """
-
-    # This will be switched to True if any node has "start_over": True
-    clean = False
 
     def log(self, m):
         if debug == True:
@@ -95,13 +94,14 @@ class Shinsplat_GreenBox:
 
     def __init__(self):
         # trigger is just a switch for each rerun
-        self.trigger = False
+        #self.trigger = False
         self.start = True # False after the first run so I know when to stop and recycle.
         prompts = []
 
     def IS_CHANGED(s, **kwargs):
-        self.trigger = not self.trigger
-        return(self.trigger)
+        #self.trigger = not self.trigger
+        #return(self.trigger)
+        return("junk")
 
     @classmethod
     def INPUT_TYPES(s):
@@ -126,18 +126,17 @@ class Shinsplat_GreenBox:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def select(self, text="", loop=False, enabled=True, chain="", start_over=False):
+    def select(self, text="", loop=False, enabled=True, chain="", start_over=False, seed=0):
+
+        clean = start_over
 
         # Set the node's global
-        self.clean = start_over
-        if self.clean == True:
+        if clean == True:
             self.start = True
             return(str([]), "", help)
 
         # Nothing in, nothing out.
         if text == "" and chain == "":
-            #if hasattr(self.__class__, 'IS_CHANGED'):
-            #    delattr(self.__class__, 'IS_CHANGED')
             self.start = True
             self.prompts = []
             # return chain, text_out and help
@@ -154,7 +153,6 @@ class Shinsplat_GreenBox:
             prompt = " ".join(chains)
             # return chain, text_out and help
             return (str(chains), prompt, help)
-
 
         # First run?
         if self.start == True:
@@ -179,7 +177,6 @@ class Shinsplat_GreenBox:
                     raise RuntimeError("The prompt is malformed and should not represent a", str( type(self.prompts[0]) ) )
                     return(str(chain), "", help)
 
-            #setattr(self.__class__, 'IS_CHANGED', IS_CHANGED)
             self.start = False
             # Flip it backwards because I'm always going to do a .pop().
             self.prompts.reverse()
