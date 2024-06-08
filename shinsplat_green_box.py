@@ -47,14 +47,6 @@ the right places (np) you're fine, extra is of no concern.
 'a prompt of quotes \\'\\'\\'\\"',
 "another prompt of quotes \\"\\'\\"\\'",
 
-# There are two directives that you can use in a comment and, if present,
-# the action will be taken, even though it is not evaluated.  These two
-# directives are CLEAN and DUST and their upper case versions must be used.
-# SD only reads lower-case so this allows us to issue commands in upper-case.
-#
-# DUST - reset this node on the next run, make sure to remove this key word after
-# CLEAN - rest this node and all those down the chain, remove this after.
-
 """
 
 
