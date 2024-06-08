@@ -47,8 +47,6 @@ class Shinsplat_Python:
         self.trigger = False
 
     def IS_CHANGED(s, **kwargs):
-        #self.trigger = not self.trigger
-        #return(self.trigger)
         return("junk")
 
     @classmethod
