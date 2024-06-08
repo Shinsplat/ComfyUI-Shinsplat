@@ -66,6 +66,30 @@ class Shinsplat_CLIPTextEncode:
     self.debug = True # Releases the print
     WEIGHTS - directive
     self.show_weights = True # Shows the token weights
+
+
+    JSON_TOKENS - If this directive exists then your text is assumed to be a
+        JSON formatted string, where it will be analyzed for its token values.  The
+        input will be either strings or integers along with their weight.
+        {}
+
+    "NUMBER_TOKENS / STRING_TOKENS / CLEAN_TOKENS_STRINGS / CLEAN_TOKENS_NUMBERS"
+    Why these?  We can give weights to words, not tokens.  I haven't found an available
+    method to weight a single token, notably when that token is only a part of the
+    derivative of a single word.  I would like to weight all parts of the word
+    separately by manipulating the tokens instead of the word.
+
+    STRING_TOKENS - the evaluator expects string tokens as shown in the vocab file
+    NUMBER_TOKENS - the evaluator expects encoded tokens in numeric format
+    CLEAN_TOKENS_STRINGS - provides an output giving you an easy copy/paste method
+    CLEAN_TOKENS_NUMBERS - same, but the number tokens alone
+
+    The number tokens are actual numbers, text representations of integer values that
+    are the encoded token.  The string tokens directive tells the evaluator that you
+    are processing text tokens, as represented in the vocab file.  And clean tokens
+    tells the evaluator to output stripped text tokens so that you can more easily
+    copy and paste them back into your encoder, without the weights and formatting.
+
     """
 
     def log(self, m,  **kwargs):

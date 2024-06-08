@@ -203,3 +203,20 @@ Sum Wrap
     t_out - where we are now (string for convenience)
     i_out - integer output
 
+Green Box
+
+	A node that iterates through a list of prompts.
+
+	These can be chained together, connecting their "chain" in/out and on the
+	very last one you connect your "prompt" to your other inputs/encoder.
+
+	"a rainy day", (chain)-> "at the beach",
+	"a cloudy day,", (chain-> "standing in front of a store named 'noodle house' ",
+
+	The loop option will start that node from the top after it runs out of prompts,
+	the "enabled" can be disabled so that this prompt doesn't function but it will
+	still pass the "chain" and "start_over", when True, will set the start bit to
+	True so that all nodes start from the top.
+
+
+
