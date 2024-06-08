@@ -98,7 +98,7 @@ class Shinsplat_Python:
         # I have to build a function in order to simplify output names.  This means that I won't
         # have access to the input names so I have to pass those to the function as arguments.
         # These are deposited as text but then compiled with "global" so that changes in their
-        # code are reflected on these outputs without having to use "self.".
+        # code are reflect on these outputs without having to use "self.".
         #header = "def funkshun(**kwargs):\n"
 
         # This function text can be used in the def and call, so I'll only have to change it
