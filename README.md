@@ -224,10 +224,16 @@ Python
 	just a way to manipulate data incoming and outgoing.  Just type in your python
 	in the text box, manipulating any of the inputs and send the result to the
 	outputs or not even that, you can perform any local task even file manipulation,
-	loading, saving, etc.  This is dangerous for the person that's uninitiated and
-	is feeling the power of Python, you can delete files and wreck your system.  If
-	you're a Python person, or code in any way at all, then you already know this.
-	If you're not, here's your sign!
+	loading, saving, etc.  The so called-built in variables are the input and output
+	names, this is how you access those ports...
 
-	import numpy as np # yes, you can do this
+	if "dog" in str_in.lower():
+		str_out = "in a park"
+	if "man" in str_in.lower():
+		str_out = "making sandwiches"
+	if "woman" in str_in.lower():
+		str_out = "operating a jackhammer"
+
+
+
 
