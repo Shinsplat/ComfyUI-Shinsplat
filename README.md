@@ -239,11 +239,11 @@ Python / Python More
 	names, this is how you access those ports...
 
 	if "dog" in str_in.lower():
-		str_out = "in a park"
+		str_out = str_in + " " + "in a park"
 	if "man" in str_in.lower():
-		str_out = "making sandwiches"
+		str_out = str_in + " " + "making sandwiches"
 	if "woman" in str_in.lower():
-		str_out = "operating a jackhammer"
+		str_out = str_in + " " + "operating a jackhammer"
 
 	The "More" alternative has 2 each of the types, so you can use this as a gate
 	as well as combine inputs to outputs.
