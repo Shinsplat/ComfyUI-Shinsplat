@@ -1,4 +1,12 @@
 shinsplat_green_box
+	6/9/2024
+		I expected to utillize comments in the prompts so people could
+		make notes.  After testing multi-line elements, again, I ran
+		into an issue, so instead of the more complex quoted prompts
+		I've decided to just read lines, and ignore redundant line breaks.
+		So your prompt iterations will be separated by the line ending \n
+		so hitting the <enter> after a prompt, like you'll find in
+		wildcard files, is the way to go.
 	6/8/2024
 		Added
 shinsplat_clip_text_encode

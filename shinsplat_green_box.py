@@ -9,45 +9,34 @@ debug = True
 clean = False
 
 help = """
+---------------------------------------------------------------------------
+My previous rendition of this had you enclose your prompts in quotation marks,
+since I wanted to evaluate each line and be able to ignore # comments but
+somewhere in my defective thinking I assumed the parser was ignoring new lines,
+and it is not.
 
-You'll need to format your prompt(s) a certain way for them to be added as a list.
+So, the way to proceed is to use 1 prompt per line, ending it
+with a return <enter> if you want to include more prompts than 1.  Extra new
+lines will be ignored so you can add double space for better readability.
 
-Each item (prompt) must be enclosed in double or single quotation marks and ending with a comma (,).  If you need to use quotation marks within your prompt, in order to quote something, you will use single quotes (') to enclose your prompt.  The following evaluates without errors, because the instructions have been commented out using the "#" symbol.  This text, itself, is not compatible.
+I could have easily stripped out the # comment line but I have no idea if
+anyone wants to use the hashmark in their prompt, and have no clue if it's
+even useful.  So, as it stands, no comments, sorry.
 
-# This is a comment.
-# You can keep notes here, it won't cause an error.
-# The following are prompt elements to iterate through...
+With the current implementation it would stand to reason that, eventually,
+I can add a file reader to replace the input.  It looks like this implementation
+would support existing wildcard files.
+---------------------------------------------------------------------------
 
-"a fiddly widdly on a boat of goats",
-"a horse full of barns",
-"a clown with a broken laugh",
+This is a prompt,
 
-# - ADVANCED -
+This is another prompt
 
-# Using quoted material
+There's a cat walking on a sidewalk wearing a hat
 
-"a T-Shirt with the text 'Happy Day' written on it.",
+a cyborg is standing in the middle of a big city street, cars all around, day time,
+a robot is eating cereal on a farm, cereal box on the table, sun shining through the window, 1960s setting
 
-# Alternatively swap your quotes, using singles to enclose
-# your prompt, which will pass exactly the same thing as
-# the above...
-
-'a T-Shirt with the text "Happy Day" written on it.',
-
-# The freedom to compose, start with a quote on a single line if you like.
-
-"
-This is a prompt element.  Extra space is striped out as being superfluous,
-the evaluator reads tokens out of words so as long as you have spaces in
-the right places (np) you're fine, extra is of no concern.
-",
-
-# If, for some goofy reason, you need to arbitrarily pass quotes, or some
-# other normally evaluated characters, to the parser, you need to double
-# escape it...
-
-'a prompt of quotes \\'\\'\\'\\"',
-"another prompt of quotes \\"\\'\\"\\'",
 
 """
 
@@ -157,25 +146,23 @@ class Shinsplat_GreenBox:
         # First run?
         if self.start == True:
             try:
-                # Add the missing brackets to represent a list containing strings,
-                # then evaluate.
-                self.prompts = ast.literal_eval("[" + text + "]")
+
+                # split everything up at the \n, creating a list
+                temp = text.splitlines()
+                # ignore all empty elements and create a new list
+                self.prompts = [] # start over
+                for l in temp:
+                    if l == "":
+                        continue
+                    self.prompts.append(l)
             except Exception as e:
                 print("=====================================")
-                print("Python list format error!")
+                print("- SOMETHING WENT WRONG, READ BELOW -")
                 print("-------------------------------------")
                 print(traceback.format_exc())
                 print("=====================================")
-                raise RuntimeError("Your text needs to be valid Python code, a dictionary.")
+                raise RuntimeError("")
                 return (str(chains), "", help)
-
-            # It's possible that a crafty person will try to add these to a string representation    
-            # of a list, which will break the process.  So I'll test the first element to make sure
-            # that it's not a list, hence they didn't add the "[]" to enclose their prompt, good.
-            if len(self.prompts) > 0:
-                if not isinstance(self.prompts[0], str):
-                    raise RuntimeError("The prompt is malformed and should not represent a", str( type(self.prompts[0]) ) )
-                    return(str(chain), "", help)
 
             self.start = False
             # Flip it backwards because I'm always going to do a .pop().

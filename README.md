@@ -210,15 +210,26 @@ Green Box
 	These can be chained together, connecting their "chain" in/out and on the
 	very last one you connect your "prompt" to your other inputs/encoder.
 
-	"a rainy day", (chain)-> "at the beach",
-	"a cloudy day,", (chain-> "standing in front of a store named 'noodle house' ",
+	I previously hoped that comments could be added to the boxes so I tried
+	to evaluate the lines to that end, but ran into a bug.  So, now we just do
+	1 line per prompt, like in wild-cards, and later this will also be able to
+	read those files and other text files.
+
+	The chain output is to link up multiple Green Box nodes.  The final output
+	is contained within the "prompt" output port.
 
 	The loop option will start that node from the top after it runs out of prompts,
 	the "enabled" can be disabled so that this prompt doesn't function but it will
 	still pass the "chain" and "start_over", when True, will set the start bit to
 	True so that the node can start from the beginning of the prompt list.
 
-Python
+	The "start_over" option will read the text again and place the pointer at the
+	top of the list.
+
+	Just add one prompter per line, ending that particular prompt is done using
+	<enter>, which is equal to the "new line" character.
+
+Python / Python More
 
 	A very simple node that I was unable to find from day one, so I made it.  It's
 	just a way to manipulate data incoming and outgoing.  Just type in your python
@@ -234,6 +245,6 @@ Python
 	if "woman" in str_in.lower():
 		str_out = "operating a jackhammer"
 
-
-
+	The "More" alternative has 2 each of the types, so you can use this as a gate
+	as well as combine inputs to outputs.
 
