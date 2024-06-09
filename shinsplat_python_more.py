@@ -4,15 +4,7 @@ import traceback
 
 debug = False
 
-help = """# ------------
-# - WARNING! -
-# ------------
-#
-# This is dangerous.  You can do anything wrong to your system.
-# ComfyUI's self contained environment won't protect you, and
-# neither will a venv or conda.  The code you place here is
-# executed without prejudice.  Good luck!
-#
+help = """
 # Variables are available by name as you see them in the UI ...
 #
 #   str_in1
