@@ -5,7 +5,6 @@ import time
 import traceback
 
 debug = True
-
 clean = False
 
 help = """
@@ -90,14 +89,17 @@ class Shinsplat_GreenBox:
     def IS_CHANGED(s, **kwargs):
         #self.trigger = not self.trigger
         #return(self.trigger)
-        return("junk")
+        #return("junk")
+        # Not a number O.o, I still don't think this is necessary, I'll test a simple node when I have time.
+        # I believe something has to get returned but I see the same regurgitated malarkey, "hash" :/
+        return float("NaN")
 
     @classmethod
     def INPUT_TYPES(s):
         return {
                     "required": {
                         "text": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
-                        "loop": ("BOOLEAN", {"default": False}),
+                        "loop": ("BOOLEAN", {"default": True}),
                         "enabled": ("BOOLEAN", {"default": True}),
                         "start_over": ("BOOLEAN", {"default": False}),
                     },
@@ -211,4 +213,7 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Green Box (Shinsplat)": "Green Box (Shinsplat)"
 }
+WEB_DIRECTORY = "./web"
+
+
 
