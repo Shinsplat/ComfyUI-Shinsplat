@@ -4,6 +4,10 @@ ComfyUI Node alterations that I found useful in my own projects and for friends.
 Clip Text Encoders add functionality like BREAK, END, pony.
 LoRA loader extracts metadata and keywords.
 
+Blue Box to compose prompt fragments along a chain.
+
+Python node to manipulate input/output anything else possible within a work-flow.
+
 If you wanna hang and make words, or you have a bug report, here's where to find me...
 https://shinsplat.com/sd/
 
