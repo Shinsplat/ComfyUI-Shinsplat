@@ -1,0 +1,14 @@
+[project]
+name = "comfyui-shinsplat"
+description = "Data manipulation and retrieval nodes.\n\nCustom CLIP Text Encode with additional input and output convenience ports.\n\nSum Wrap, a simple integer roll-over iterator.\n\nCustom LoRA Loader to extract and view meta-data and trigger phrases.\n\nGreen Box is a node that can be chained to inject prompt fragments, iterating through a list.\n\nPython is a node that allows complete control, manipulation and creation of data, write your Python code inside this node.  Multiple input/output ports referenced by name."
+version = "1.0.0"
+license = "LICENSE"
+
+[project.urls]
+Repository = "https://github.com/Shinsplat/ComfyUI-Shinsplat"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-Shinsplat"
+Icon = ""
