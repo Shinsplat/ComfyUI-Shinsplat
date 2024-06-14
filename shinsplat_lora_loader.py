@@ -362,6 +362,9 @@ class Shinsplat_LoraLoader:
                         if len(freq) == 0:
                             break
                         count = freq.pop()
+                        # KLUDGE, key error phrase_index[count] - look into it later
+                        if count not in phrases[phrase_index]:
+                            continue
                         if len(phrases[phrase_index][count]) == 0:
                             continue
                         top_sub = total_sub
