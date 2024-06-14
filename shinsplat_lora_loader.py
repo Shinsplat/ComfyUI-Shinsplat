@@ -345,8 +345,8 @@ class Shinsplat_LoraLoader:
                 # so I should provide a sample from each and I use "total_top" to count
                 # how many of those I take.  This "total_top" may become a feature in
                 # the future instead of hard-coded.
+                counts = set()
                 for phrase_index in phrases:
-                    counts = set()
                     triggers += "phrase index: " + phrase_index + "\n"
                     for phrase_count in phrases[phrase_index]:
                         counts.add(phrase_count)
