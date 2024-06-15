@@ -346,6 +346,7 @@ class Shinsplat_LoraLoader:
                 # how many of those I take.  This "total_top" may become a feature in
                 # the future instead of hard-coded.
                 counts = set()
+                freq = list()
                 for phrase_index in phrases:
                     triggers += "phrase index: " + phrase_index + "\n"
                     for phrase_count in phrases[phrase_index]:

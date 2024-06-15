@@ -192,7 +192,9 @@ class Shinsplat_CLIPTextEncode:
 
         # See if there's an "END" directive first.  It's only useful a single time so take the first one
         # and ignore the rest.
-        start_block = text.split("END")[0]
+        start_block = text
+        if 'END' in text:
+            start_block = text.split("END")[0]
 
         # ------------------------------------------------------------------------
         # debug

@@ -1,6 +1,19 @@
+shinsplat_variables:
+	6/14/2024
+		A basic variable implementation, add $VARIABLES
+		to your text input and use a dictionary/JSON
+		to describe the changes, "VARIABLES": "this stuff",
+shinsplat_string_interpolated:
+	6/14/2024
+		The existing text nodes didn't fit my needs,
+		I enabled dynamic prompts and added the END
+		directive.
+sinsplat_python:
+	6/9/2024
+		Run python code from a text node
 shinsplat_green_box
 	6/9/2024
-		I expected to utillize comments in the prompts so people could
+		I expected to utilize comments in the prompts so people could
 		make notes.  After testing multi-line elements, again, I ran
 		into an issue, so instead of the more complex quoted prompts
 		I've decided to just read lines, and ignore redundant line breaks.
@@ -17,7 +30,7 @@ shinsplat_clip_text_encode
 	6/2/2024
 		I added a couple of switches to improve my entertainment value,
 		they shift the tensor weights and reverse them.  The results
-		are not unpleasnt.
+		are not unpleasant.
 
 		And on this same day I turned these switches into directives
 		because I didn't like the clutter.
