@@ -237,6 +237,10 @@ Green Box
 	Just add one prompter per line, ending that particular prompt is done using
 	<enter>, which is equal to the "new line" character.
 
+## END
+
+	Everything after this uppercase term is ignored.
+
 Python / Python More
 
 	A very simple node that I was unable to find from day one, so I made it.  It's

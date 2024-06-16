@@ -12,6 +12,8 @@ sinsplat_python:
 	6/9/2024
 		Run python code from a text node
 shinsplat_green_box
+	6/16/2024
+		I added the "END" directive, everything after this uppercase term is ignored.
 	6/9/2024
 		I expected to utilize comments in the prompts so people could
 		make notes.  After testing multi-line elements, again, I ran
