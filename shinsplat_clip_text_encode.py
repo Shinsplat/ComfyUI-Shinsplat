@@ -176,7 +176,8 @@ class Shinsplat_CLIPTextEncode:
         if prompt_before != "":
                 #text = text + " " + prompt_before
                 text = prompt_before + " " + " " + text
-                prompt_out = prompt_before + " " + prompt_out
+                # nope, don't pass inputs since they can be noodled if needed
+                #prompt_out = prompt_before + " " + prompt_out
 
         # Put the pony stuff in if they wanted it.
         # Also include the raw text output, exposed on "prompt".
@@ -186,7 +187,8 @@ class Shinsplat_CLIPTextEncode:
         # Append this to everything else.
         if prompt_after != "":
                 text = text + " " + prompt_after
-                prompt_out = prompt_out + " " + prompt_after
+                # nope, SA
+                #prompt_out = prompt_out + " " + prompt_after
 
         tokens = dict()
 
@@ -425,13 +427,6 @@ class Shinsplat_CLIPTextEncode:
             tokens_count += str(token_count) + " tokens\n"
             token_count = 0 # reset for next iter
             tokens_count += "    End Token: " + str(last_token) + "\n"
-
-
-
-
-
-
-
 
 
         # Pull out the token words using the integer.

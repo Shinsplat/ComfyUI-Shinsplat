@@ -25,6 +25,11 @@ shinsplat_green_box
 	6/8/2024
 		Added
 shinsplat_clip_text_encode
+	6/16/2024
+		Custom inputs were being passed to prompt_out, this is probably
+		not an expected behavior and noodles can be piped into the areas
+		needed instead of using this node as a gateway.  I removed flaw.
+
 	6/6/2024
 		The prompt_before wasn't working properly, should be fixed now.
 
