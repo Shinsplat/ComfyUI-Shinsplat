@@ -192,6 +192,10 @@ LoRA Loader
 	additional prompt words and is convenient if you use the same set of prompt
 	words for some LoRAs.
 
+## prompt_solo_before/after
+
+	These won't get added to the output.
+
 Sum Wrap
 
 	An incrementor with a target (ceiling), steps to that target and what to
@@ -251,33 +255,4 @@ Python / Python More
 
 	The "More" alternative has 2 each of the types, so you can use this as a gate
 	as well as combine inputs to outputs.
-
-String Interpolated
-
-	It's just string literal, with dynamicPrompts enabled.
-
-Variables
-
-	Assign text to variables.  Very early implementation but works if you're careful,
-	you can't have, say, $THIS and $THIS2 yet.
-
-	"THIS": "a big black car",
-	"THAT": "a long dark road",
-
-	And in  your text inputter, "String Interpolated" maybe,
-
-	a dog is driving $THIS along $THAT .
-	-> a dog is driving a big black car along a long dark road .
-
-CLIP Text Encode SD3 (Shinsplat)
-
-	Includes the END directive, BREAK coming later maybe but so far I have not seen
-	anything useful come out of this BREAK implementation, it does what it's
-	supposed to do, as far as I can tell, but not what I want.  I may have bugged it
-	so I'll check later.  To be clear, BREAK is NOT included in this custom node.
-
-
-
-
-
 
