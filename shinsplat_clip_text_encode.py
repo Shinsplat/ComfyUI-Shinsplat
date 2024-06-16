@@ -175,7 +175,7 @@ class Shinsplat_CLIPTextEncode:
         # Also include the raw text output, exposed on "prompt".
         if prompt_before != "":
                 #text = text + " " + prompt_before
-                text = prompt_before + " " + prompt_solo_before + " " + " " + text
+                text = prompt_before + " " + " " + text
                 prompt_out = prompt_before + " " + prompt_out
 
         # Put the pony stuff in if they wanted it.
@@ -185,7 +185,7 @@ class Shinsplat_CLIPTextEncode:
 
         # Append this to everything else.
         if prompt_after != "":
-                text = text + " " + prompt_after + " " + prompt_solo_after
+                text = text + " " + prompt_after
                 prompt_out = prompt_out + " " + prompt_after
 
         tokens = dict()
