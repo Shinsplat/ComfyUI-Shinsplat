@@ -25,8 +25,6 @@ shinsplat_green_box
 	6/8/2024
 		Added
 shinsplat_clip_text_encode
-	6/16/2024
-		Added prompt solo before/after that doesn't get passed to the output.
 	6/6/2024
 		The prompt_before wasn't working properly, should be fixed now.
 

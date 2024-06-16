@@ -130,14 +130,14 @@ class Shinsplat_CLIPTextEncode:
                         },
             }
 
-    RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING",       "STRING", )
-    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "tokens_raw",   "prompt_out", )
+    RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING",       "STRING",)
+    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "tokens_raw",   "prompt_out",)
 
     FUNCTION = "encode"
 
     CATEGORY = "advanced/Shinsplat"
 
-    def encode(self, clip, text, pony=False, prompt_before="", prompt_after=""):
+    def encode(self, clip, text, pony=False, prompt_before="", prompt_after="",):
 
         # ------------------------------------------------------------------------
         # load tokens
@@ -164,7 +164,7 @@ class Shinsplat_CLIPTextEncode:
         #
         # ------------------------------------------------------------------------
 
-        prompt_out = text
+        prompt_out = text.split("END")[0]
 
         # This could be 'h' later if using SD 2.1 768 .
         # This will not exist in Cascade.  I'll change this
@@ -175,7 +175,7 @@ class Shinsplat_CLIPTextEncode:
         # Also include the raw text output, exposed on "prompt".
         if prompt_before != "":
                 #text = text + " " + prompt_before
-                text = prompt_before + " " + text
+                text = prompt_before + " " + prompt_solo_before + " " + " " + text
                 prompt_out = prompt_before + " " + prompt_out
 
         # Put the pony stuff in if they wanted it.
@@ -185,7 +185,7 @@ class Shinsplat_CLIPTextEncode:
 
         # Append this to everything else.
         if prompt_after != "":
-                text = text + " " + prompt_after
+                text = text + " " + prompt_after + " " + prompt_solo_after
                 prompt_out = prompt_out + " " + prompt_after
 
         tokens = dict()

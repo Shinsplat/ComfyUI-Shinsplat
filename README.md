@@ -192,10 +192,6 @@ LoRA Loader
 	additional prompt words and is convenient if you use the same set of prompt
 	words for some LoRAs.
 
-## prompt_solo_before/after
-
-	These won't get added to the output.
-
 Sum Wrap
 
 	An incrementor with a target (ceiling), steps to that target and what to
