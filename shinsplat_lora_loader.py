@@ -171,8 +171,7 @@ class Shinsplat_LoraLoader:
             if hasattr(self.__class__, 'IS_CHANGED'):
                 delattr(self.__class__, 'IS_CHANGED')
 
-        # This wasn't documented but it's obvious that there's no sense in
-        # running of there's no weights to change.
+        # no weights to change.
         if strength_model == 0 and strength_clip == 0:
             return (model, clip)
 
