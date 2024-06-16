@@ -164,7 +164,10 @@ class Shinsplat_CLIPTextEncode:
         #
         # ------------------------------------------------------------------------
 
+        # I need to respect the END directive in all inputs separately.
         prompt_out = text.split("END")[0]
+        prompt_before = prompt_before.split("END")[0]
+        prompt_after = prompt_after.split("END")[0]
 
         # This could be 'h' later if using SD 2.1 768 .
         # This will not exist in Cascade.  I'll change this
@@ -194,9 +197,7 @@ class Shinsplat_CLIPTextEncode:
 
         # See if there's an "END" directive first.  It's only useful a single time so take the first one
         # and ignore the rest.
-        start_block = text
-        if 'END' in text:
-            start_block = text.split("END")[0]
+        start_block = text.split("END")[0]
 
         # ------------------------------------------------------------------------
         # debug
