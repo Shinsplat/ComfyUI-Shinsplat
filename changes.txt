@@ -25,6 +25,12 @@ shinsplat_green_box
 	6/8/2024
 		Added
 shinsplat_clip_text_encode
+	6/17/2024
+		Updated to include the T5, 'END' directive is honored,
+		blocks are no longer needed in t5 so, while the blocks are
+		are still split in 'l', 'h' and 'g' the t5 block is just
+		1 segment, as it apparently should be.
+
 	6/16/2024
 		Custom inputs were being passed to prompt_out, this is probably
 		not an expected behavior and noodles can be piped into the areas
