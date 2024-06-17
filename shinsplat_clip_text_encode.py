@@ -139,6 +139,12 @@ class Shinsplat_CLIPTextEncode:
 
     def encode(self, clip, text, pony=False, prompt_before="", prompt_after="",):
 
+        # NOTE: I'm going to need 'l' and possibly 'g' for t5, and this is NOT
+        # an SDXL specific encoder so I should be able to duplicate one into
+        # the other without a problem.  Somewhere below will be the code to do
+        # this.
+
+
         # ------------------------------------------------------------------------
         # load tokens
         # ------------------------------------------------------------------------
@@ -302,6 +308,7 @@ class Shinsplat_CLIPTextEncode:
 # /
 
             else:
+
                 if "l" not in temp_tokens and 'h' not in temp_tokens:
                     base_block = "g"
 
@@ -330,30 +337,12 @@ class Shinsplat_CLIPTextEncode:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
         # Add this regardless, for the updated SD3, adding a block shouldn't cause an issue.
         tokens['t5xxl'] = clip.tokenize(t5xxl_block)["t5xxl"]
-# T
-#        breakpoint()
-# /
+
         # ------------------------------------------------------------------------
         # raw tokens parsing
         # ------------------------------------------------------------------------
@@ -412,17 +401,29 @@ class Shinsplat_CLIPTextEncode:
 #                temp_tokens = clip.tokenize("")
 
 # ########
-
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
-
         # If I didn't get any good tokens then this will pose a problem,
         # just default to what it would normally do.
+
+        # I might have t5 tokens only, so this won't work these days but I'll write
+        # some additional code before, before the process ends, to fill 'l' and 'g'
+        # with blanks.
         if len(tokens) == 0:
             self.log("no tokens")
             #tokens = clip.tokenize(text)
             tokens = clip.tokenize(start_block)
+
+        # I'll only run into an issue where I need this is when there's nothing
+        # to deliver from the text input, so in that case I'll just write blank.
+        tok = clip.tokenize("")
+        if 'l'  not in tokens:
+            if 'l' in tok:
+                tokens['l'] = tok['l']
+        if 'g' not in tokens:
+            if 'g' in tok:
+                tokens['g'] = tok['g']
 
         # I'll gather the token data so they can use it as a guide to structure their prompt better.
         #
@@ -437,44 +438,54 @@ class Shinsplat_CLIPTextEncode:
         last_token = "Null"
 
         tokens_count += "clip has "
-        tokens_count += str(len(tokens[base_block])) + " blocks\n"
+        if base_block in tokens:
+            tokens_count += str(len(tokens[base_block])) + " blocks\n"
+        else:
+            tokens_count += " 0 blocks\n"
         block_number = 0
         token_count = 0
-        for tokens_base_block in tokens[base_block]:
-            for token, weight, in tokens_base_block:
-                if token == 49407:
-                    break
-                else:
-                    # Save the last token before the 'stop' in case it's useful in the future.
-                    last_token = token
-                    token_count += 1
 
-            block_number += 1
-            # tokens are always 1 less than iter because we don't count the start token
-            token_count -= 1
-            tokens_count += "    Block: " + str(block_number) + " has "
-            tokens_count += str(token_count) + " tokens\n"
-            token_count = 0 # reset for next iter
-            tokens_count += "    End Token: " + str(last_token) + "\n"
+        # I don't want to manipulate data that isn't there.
+        if base_block in tokens:
+            for tokens_base_block in tokens[base_block]:
+                for token, weight, in tokens_base_block:
+                    if token == 49407:
+                        break
+                    else:
+                        # Save the last token before the 'stop' in case it's useful in the future.
+                        last_token = token
+                        token_count += 1
+
+                block_number += 1
+                # tokens are always 1 less than iter because we don't count the start token
+                token_count -= 1
+                tokens_count += "    Block: " + str(block_number) + " has "
+                tokens_count += str(token_count) + " tokens\n"
+                token_count = 0 # reset for next iter
+                tokens_count += "    End Token: " + str(last_token) + "\n"
 
 
-        # Pull out the token words using the integer.
-        tokens_used = ""
-        block_number = 0
-        for tokens_base_block in tokens[base_block]:
-            block_number += 1
-            tokens_used += "\n" + "- block: " + str(block_number) + " -\n"
-            for token, weight, in tokens_base_block:
-                if token == 49406: # Start token
-                    continue
-                if token == 49407: # End token
-                    tokens_used += "\n"
-                    break
-                if token not in tokens_dict:
-                    tokens_used += "<unk> "
-                else:
-                    word =  tokens_dict[token].replace("</w>", "")
-                    tokens_used += word + " "
+            # Pull out the token words using the integer.
+            tokens_used = ""
+            block_number = 0
+            for tokens_base_block in tokens[base_block]:
+                block_number += 1
+                tokens_used += "\n" + "- block: " + str(block_number) + " -\n"
+                for token, weight, in tokens_base_block:
+                    if token == 49406: # Start token
+                        continue
+                    if token == 49407: # End token
+                        tokens_used += "\n"
+                        break
+                    if token not in tokens_dict:
+                        tokens_used += "<unk> "
+                    else:
+                        word =  tokens_dict[token].replace("</w>", "")
+                        tokens_used += word + " "
+
+# T
+        breakpoint()
+# /
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
 
@@ -583,6 +594,10 @@ class Shinsplat_CLIPTextEncode:
                     # Get the string token associated with this token value.
                     token_value = tokens_dict[t]
                     tokens_raw += "(" + token_value + ":" + str(t) + ":" + str(w) + ") "
+
+# T
+#        breakpoint()
+# /
 
         return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_raw, prompt_out)
 # --------------------------------------------------------------------------------
