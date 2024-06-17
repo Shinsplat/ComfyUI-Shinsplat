@@ -10,6 +10,7 @@ ComfyUI Node alterations that I found useful in my own projects and for friends.
 """
 
 from .shinsplat_clip_text_encode import *
+from .shinsplat_clip_text_encode_T5 import *
 from .shinsplat_clip_text_encode_SD3 import *
 from .shinsplat_clip_text_encode_sdxl import *
 from .shinsplat_lora_loader import *
@@ -25,6 +26,7 @@ from .shinsplat_variables import *
 # --------------------------------------------------------------------------------
 NODE_CLASS_MAPPINGS = {
     "Clip Text Encode (Shinsplat)": Shinsplat_CLIPTextEncode,
+    "Clip Text Encode T5 (Shinsplat)": Shinsplat_CLIPTextEncodeT5,
     "Clip Text Encode SD3 (Shinsplat)": Shinsplat_CLIPTextEncodeSD3,
     "Clip Text Encode SDXL (Shinsplat)": Shinsplat_CLIPTextEncodeSDXL,
     "Lora Loader (Shinsplat)": Shinsplat_LoraLoader,
@@ -37,6 +39,7 @@ NODE_CLASS_MAPPINGS = {
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Clip Text Encode (Shinsplat)": "Clip Text Encode (Shinsplat)",
+    "Clip Text Encode T5 (Shinsplat)": "Clip Text Encode T5 (Shinsplat)",
     "Clip Text Encode SD3 (Shinsplat)": "Clip Text Encode SD3 (Shinsplat)",
     "Clip Text Encode SDXL (Shinsplat)": "Clip Text Encode SDXL (Shinsplat)",
     "Lora Loader (Shinsplat)": "Lora Loader (Shinsplat)",
