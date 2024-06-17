@@ -275,6 +275,9 @@ class Shinsplat_CLIPTextEncode:
         # Split the text into segments using the "BREAK" word as a delimiter, in caps of course.
         text_blocks = start_block.split("BREAK")
 
+        # There are no blocks in t5, it's all one segment.
+        t5xxl_block = start_block.replace("BREAK", "")
+
         # Iterate over each block and have the clip encode their types.
         for block in text_blocks:
             # I won't create an entire block for white-space.
@@ -299,7 +302,6 @@ class Shinsplat_CLIPTextEncode:
 # /
 
             else:
-
                 if "l" not in temp_tokens and 'h' not in temp_tokens:
                     base_block = "g"
 
@@ -326,6 +328,32 @@ class Shinsplat_CLIPTextEncode:
                     for tensor_block in temp_tokens['g']:
                         tokens['g'].append(tensor_block)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+        # Add this regardless, for the updated SD3, adding a block shouldn't cause an issue.
+        tokens['t5xxl'] = clip.tokenize(t5xxl_block)["t5xxl"]
+# T
+#        breakpoint()
+# /
         # ------------------------------------------------------------------------
         # raw tokens parsing
         # ------------------------------------------------------------------------
@@ -556,12 +584,7 @@ class Shinsplat_CLIPTextEncode:
                     token_value = tokens_dict[t]
                     tokens_raw += "(" + token_value + ":" + str(t) + ":" + str(w) + ") "
 
-        # ------------------------------------------------------------------------
-        #
-        # ------------------------------------------------------------------------
-
         return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_raw, prompt_out)
-
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
