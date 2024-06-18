@@ -1,7 +1,7 @@
 # Shinsplat Tarterbox
 import os
 import json
-import comfy
+import comfy # initially to get a relative path
 import folder_paths
 # --------------------------------------------------------------------------------
 #
@@ -55,6 +55,11 @@ class Shinsplat_CLIPTextEncodeT5:
     """
 
     def __init__(self):
+        # looks like this will get me to 'configs' folder, found it in nodes.CheckpointLoader
+        #
+        # folder_paths.get_filename_list("configs")
+        # Make a couple of lookup tables for the tokens.
+
         base_path = comfy.__path__[0]
         tok_f = os.path.join(base_path, "t5_tokenizer", "tokenizer.json")
         tf = open(tok_f, "r", encoding="utf-8")
@@ -64,18 +69,25 @@ class Shinsplat_CLIPTextEncodeT5:
         r = td['decoder']['replacement']
         self.tokens_fwd = {}
         self.tokens_rev = {}
+        # I want a forward and reverse lookup, I think O.o
         count = 0
         for t,w in td['model']['vocab']:
             if r in t:
+                # True then r is 1 character key, I guess I should keep it
                 if len(t) == 1:
                     pass
+                # or remove the obfikoodle, I've only seen starts, not ends, though
+                # there appears to be reference to change this later *shrugs*
                 else:
                     t = t.lstrip(r)
+            # save the word token as the key into the weight and "encoded" token
             self.tokens_fwd[t] = { "token": count, "weight": w, }
+            # save the "encoded" token as the key
             self.tokens_rev[count] = { "token": t, "weight": w, }
             count += 1
         del content
         del td
+        # data['model']['vocab'][1782] # token for "dog".
 
     @classmethod
     def INPUT_TYPES(s):
@@ -102,13 +114,23 @@ class Shinsplat_CLIPTextEncodeT5:
 
     def encode(self, clip, clip_l, clip_g, t5xxl, empty_padding, prompt_before="", prompt_after=""):
 
+# T
+        # ------------------------------------------------------------------------
+        print("t5xxl has been temporarily modified to include prompt_before/after")
+        t5xxl = prompt_before + " " + t5xxl + " " + prompt_after
+        # ------------------------------------------------------------------------
+# /
+
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
+        # I want to find the 'END' directive and ignore everything after, so I'll
+        # change the strings and pass the changed ones along.
         clip_l = clip_l.split("END")[0]
         clip_g = clip_g.split("END")[0]
         t5xxl = t5xxl.split("END")[0]
 
+        # get raw tokens, the data will be appended to the tensors at the end.
         raw_tokens = []
         if "RAW" in t5xxl:
             rt = t5xxl.split("RAW")[-1]
@@ -118,11 +140,22 @@ class Shinsplat_CLIPTextEncodeT5:
                 raw_tokens = rtt.split()
                 print("raw tokens:", rtt)
 
+        # Do this to the custom input as well, I don't want to pass END directives along
+        # I'll test embedding clip splits after this.
         prompt_before = prompt_before.split("END")[0]
         prompt_after = prompt_after.split("END")[0]
+
+        # TODO:  add input filters to split this up, not sure what I'm going to
+        # do with prompt/before|after yet.  I suspect that the separated clips
+        # will function as mysteriously as the one for the specific XL variation.
+        # I could make a simple node that takes the ports and splits them up into
+        # segments of ... cl, cg, t5 and the added pb and pa. *shrugs* whatever.
+        #
+        # Output all of the text, sandwiched, including active directives.
         prompt_out = prompt_before
         prompt_out += " CLIP_L " + clip_l + " CLIP_G " + clip_g + " T5XXL " + t5xxl
         prompt_out += " " + prompt_after
+
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
@@ -144,18 +177,31 @@ class Shinsplat_CLIPTextEncodeT5:
                 tokens["l"] += empty["l"]
             while len(tokens["l"]) > len(tokens["g"]):
                 tokens["g"] += empty["g"]
-
+        # raw tokens
         if len(raw_tokens):
             for t in raw_tokens:
                 if t.isnumeric():
                     tup = (int(t), 1.0)
+                    # If there's no text delivered then RAW will be the only thing standing.
+                    if 't5xxl'  not in tokens:
+                        tokens["t5xxl"] = clip.tokenize("")["t5xxl"]
+                    if len(tokens['t5xxl']) == 0:
+                       tokens["t5xxl"].append([])
+
                     tokens['t5xxl'][0].append(tup)
+
+# T
+#        breakpoint()
+# /
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
+        # I can grab the tokens now and lookup the word portion.
         tokens_out = ""
+        # My testing shows that there's only 1 block, not broken up, despite that
+        # it is formed similarly to the other clip doohickeys.
         if len(tokens['t5xxl']):
             t5 = tokens['t5xxl'][0]
             for t,NUL in t5:
@@ -163,7 +209,7 @@ class Shinsplat_CLIPTextEncodeT5:
                 if t == 0:
                     continue
                 if t not in self.tokens_rev:
-                    print("missing token:", str(t))
+                    pass
                 else:
                     word = self.tokens_rev[t]['token']
                     weight = self.tokens_rev[t]['weight']
@@ -171,6 +217,7 @@ class Shinsplat_CLIPTextEncodeT5:
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
+
         return ([[cond, {"pooled_output": pooled}]], prompt_out, tokens_out)
 # --------------------------------------------------------------------------------
 #
