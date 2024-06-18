@@ -341,7 +341,10 @@ class Shinsplat_CLIPTextEncode:
         #
         # ------------------------------------------------------------------------
         # Add this regardless, for the updated SD3, adding a block shouldn't cause an issue.
-        tokens['t5xxl'] = clip.tokenize(t5xxl_block)["t5xxl"]
+        try:
+            tokens['t5xxl'] = clip.tokenize(t5xxl_block)["t5xxl"]
+        except:
+            pass
 
         # ------------------------------------------------------------------------
         # raw tokens parsing
