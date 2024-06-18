@@ -1,3 +1,9 @@
+shinsplat_clip_text_encode_T5:
+	There's an SD3 version of this as well but I think I'll be working with this mostly
+	because SD3 is probably not viable and I won't need to do anything more than testing
+	and digging into the code and model, but anyway...
+	6/14/2024
+		Updated so that the directives are not piped to the output "prompt_out".
 shinsplat_variables:
 	6/14/2024
 		A basic variable implementation, add $VARIABLES

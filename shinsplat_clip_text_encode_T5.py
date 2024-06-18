@@ -52,9 +52,20 @@ class Shinsplat_CLIPTextEncodeT5:
     "END" - directive
     When this is encountered nothing after it will be conditioned.  This directive
     can be used in clip_l, clip_g and t5xxl..
+
+    "CLIP_INVERT / POOL_INVERT / CLIP_SHIFT / POOL_SHIFT" - directive
+    I'm having some fun goofing with the data, these just do a bit of fiddling with
+    the return values of tensors.  How I manipulate them probably isn't important
+    and certainly doesn't seem to produce any practical results so this is just for
+    entertainment.
+
     """
+    def log(self, m):
+        if self.debug:
+            print(m)
 
     def __init__(self):
+        self.debug = False
         # Make a couple of lookup tables for the tokens.
         base_path = comfy.__path__[0]
         tok_f = os.path.join(base_path, "t5_tokenizer", "tokenizer.json")
@@ -111,6 +122,9 @@ class Shinsplat_CLIPTextEncodeT5:
     def encode(self, clip, clip_l, clip_g, t5xxl, empty_padding, prompt_before="", prompt_after=""):
 
 # T
+        #prompt_before = prompt_before.split("END")[0]
+        #prompt_after = prompt_after.split("END")[0]
+
         # ------------------------------------------------------------------------
         print("t5xxl has been temporarily modified to include prompt_before/after : line 115", __file__)
         t5xxl = prompt_before + " " + t5xxl + " " + prompt_after
@@ -118,14 +132,41 @@ class Shinsplat_CLIPTextEncodeT5:
 # /
 
         # ------------------------------------------------------------------------
-        #
+        # END directive
         # ------------------------------------------------------------------------
         # I want to find the 'END' directive and ignore everything after, so I'll
         # change the strings and pass the changed ones along.
         clip_l = clip_l.split("END")[0]
         clip_g = clip_g.split("END")[0]
         t5xxl = t5xxl.split("END")[0]
+        # ------------------------------------------------------------------------
+        # set variables to indicate tensor manipulation types
+        # ------------------------------------------------------------------------
+        remove_directives = ['CLIP_INVERT', 'POOL_INVERT', 'CLIP_SHIFT', 'POOL_SHIFT', 'DEBUG']
 
+        self.debug = False
+        if 'DEBUG' in t5xxl:
+            self.debug = True
+
+        clip_invert = False
+        pool_invert = False
+        clip_shift = False
+        pool_shift = False
+        if 'CLIP_INVERT' in t5xxl:
+            clip_invert = True
+        if 'POOL_INVERT' in t5xxl:
+            pool_invert = True
+        if 'CLIP_SHIFT' in t5xxl:
+            clip_shift = True
+        if 'POOL_SHIFT' in t5xxl:
+            pool_shift = True
+        # Remove the directives from the block and the raw text so that it doesn't
+        # get interpreted or travel to the next node.
+        for t in remove_directives:
+            t5xxl = t5xxl.replace(t, "")
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
         # get raw tokens, the data will be appended to the tensors at the end.
         raw_tokens = []
         if "RAW" in t5xxl:
@@ -149,8 +190,17 @@ class Shinsplat_CLIPTextEncodeT5:
         #
         # Output all of the text, sandwiched, including active directives.
         prompt_out = prompt_before
-        prompt_out += " CLIP_L " + clip_l + " CLIP_G " + clip_g + " T5XXL " + t5xxl
+        prompt_out += clip_l + " CLIP_L " + clip_g + " CLIP_G " + t5xxl + " T5XXL "
         prompt_out += " " + prompt_after
+
+        # Don't pass the directives to other places, it's only for THIS node's use.
+        for rd in remove_directives:
+           prompt_out = prompt_out.replace(rd, "")
+# T
+        print("=================================")
+        print("prompt_out:", prompt_out)
+        print("=================================")
+# /
 
         # ------------------------------------------------------------------------
         #
@@ -206,6 +256,76 @@ class Shinsplat_CLIPTextEncodeT5:
                     word = self.tokens_rev[t]['token']
                     weight = self.tokens_rev[t]['weight']
                     tokens_out += word + ":" + str(t) + ":" + str(weight) + "\n"
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+
+        # ------------------------------------------------------------------------
+        # tensor manipulation
+        # ------------------------------------------------------------------------
+        # Reverse or shift the tensors.  It's just a fun visual to watch, you don't
+        # know what you'll get but it hasn't bee completely useless.
+        if clip_invert:
+            self.log("    -> clip_invert - enabled")
+            tb_count = 0
+            for tb in cond:
+                t_count = 0
+                for t in tb:
+                    # I don't know the methods in a tensor in order to reverse
+                    # so I'll pass it to a list first and put it all back float
+                    # by float.
+                    floats_list = [a for a in t]
+                    floats_list.reverse()
+                    f_count = 0
+                    for f in floats_list:
+                        cond[tb_count][t_count][f_count] = f
+                        f_count += 1
+                    t_count += 1
+                tb_count += 1
+        # pool
+        if pool_invert:
+            self.log("    -> pool_invert - enabled")
+            tp_count = 0
+            for tp in pooled:
+                pooled_list = [a for a in tp]
+                pooled_list.reverse()
+                f_count = 0
+                for f in tp:
+                    pooled[tp_count][f_count] = pooled_list[f_count]
+                    f_count += 1
+                tp_count += 1
+        if clip_shift:
+            self.log("    -> clip_shift - enabled")
+            tb_count = 0
+            for tb in cond:
+                t_count = 0
+                for t in tb:
+                    # I have the tensor list for this block in t, because this is
+                    # greater than 0 I'll pop tensor_shift floats off the end.
+                    float_list = [a for a in t]
+                    clip_half = int( len(float_list) / 2 )
+                    for i in range(clip_half):
+                        float_list.insert(len(float_list) + 1, float_list.pop(0))
+                    # put it all back
+                    f_count = 0
+                    for f in float_list:
+                        cond[tb_count][t_count][f_count] = f
+                        f_count += 1
+                    t_count += 1
+                tb_count += 1
+        if pool_shift:
+            self.log("    -> pool_shift - enabled")
+            tp_count = 0
+            for tp in pooled:
+                float_list = [a for a in tp]
+                pool_half =  int( len(float_list) / 2 )
+                for i in range(pool_half):
+                    float_list.insert(len(float_list) + 1, float_list.pop(0))
+                f_count = 0
+                for f in tp:
+                    pooled[tp_count][f_count] = float_list[f_count]
+                    f_count += 1
+                tp_count += 1
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
