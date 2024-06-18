@@ -483,10 +483,6 @@ class Shinsplat_CLIPTextEncode:
                         word =  tokens_dict[token].replace("</w>", "")
                         tokens_used += word + " "
 
-# T
-        breakpoint()
-# /
-
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
 
         # debug
