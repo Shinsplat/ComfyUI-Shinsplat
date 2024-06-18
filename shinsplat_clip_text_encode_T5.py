@@ -45,9 +45,9 @@ class Shinsplat_CLIPTextEncodeT5:
     Max: 32127
 
     Conclusion:
-    We seem to have about 128 tokens unaccounted for.  I presume that that they didn't
-    need to move into another page and just didn't have a need for the remainder in this
-    block, and 128 is, as you may know, a convenient block (7Fh is 128d countable).
+    We seem to have about 128 tokens unaccounted for.  I presume that they didn't
+    need to move into another page and just didn't have a need for the remainder in
+    this block, and 128 is, as you may know, a convenient block (7Fh is 128d countable).
 
     "END" - directive
     When this is encountered nothing after it will be conditioned.  This directive
@@ -55,11 +55,7 @@ class Shinsplat_CLIPTextEncodeT5:
     """
 
     def __init__(self):
-        # looks like this will get me to 'configs' folder, found it in nodes.CheckpointLoader
-        #
-        # folder_paths.get_filename_list("configs")
         # Make a couple of lookup tables for the tokens.
-
         base_path = comfy.__path__[0]
         tok_f = os.path.join(base_path, "t5_tokenizer", "tokenizer.json")
         tf = open(tok_f, "r", encoding="utf-8")
@@ -116,7 +112,7 @@ class Shinsplat_CLIPTextEncodeT5:
 
 # T
         # ------------------------------------------------------------------------
-        print("t5xxl has been temporarily modified to include prompt_before/after")
+        print("t5xxl has been temporarily modified to include prompt_before/after : line 115", __file__)
         t5xxl = prompt_before + " " + t5xxl + " " + prompt_after
         # ------------------------------------------------------------------------
 # /
@@ -209,7 +205,7 @@ class Shinsplat_CLIPTextEncodeT5:
                 else:
                     word = self.tokens_rev[t]['token']
                     weight = self.tokens_rev[t]['weight']
-                    tokens_out += word + ":" + str(weight) + "\n"
+                    tokens_out += word + ":" + str(t) + ":" + str(weight) + "\n"
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
