@@ -256,3 +256,17 @@ Python / Python More
 	The "More" alternative has 2 each of the types, so you can use this as a gate
 	as well as combine inputs to outputs.
 
+
+Hex to Other
+
+	Convert a string representation of a hex value to an integer/float outpuot.
+
+
+
+
+
+
+
+
+
+
