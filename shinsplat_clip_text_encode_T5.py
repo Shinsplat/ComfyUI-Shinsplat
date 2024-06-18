@@ -190,10 +190,6 @@ class Shinsplat_CLIPTextEncodeT5:
 
                     tokens['t5xxl'][0].append(tup)
 
-# T
-#        breakpoint()
-# /
-
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
         # ------------------------------------------------------------------------
         #
