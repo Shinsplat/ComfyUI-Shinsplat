@@ -74,6 +74,19 @@ class Shinsplat_GreenBox:
     This will reset the node data and start from the beginning.  I've chosen to keep
     this local, instead of affecting all of the nodes, since it's the most logical
     and easier path.
+
+    "END" - directive
+    everything after this uppercase word is ignored
+
+    - chain -
+    Pipe these node together using this, ultimately ending in the "prompt" output.
+
+    - _int, _flt -
+    An attempt will be nade to produce integers and floating points for these outputs.
+    I initially added these so that I could iterate generations using the same seed
+    for a specific number of generations, so that I could add different prompts or
+    in put, for those/that same seeds.
+
     """
 
     def log(self, m):
@@ -108,8 +121,8 @@ class Shinsplat_GreenBox:
                             },
             }
 
-    RETURN_TYPES = ("STRING", "STRING",   "STRING",)
-    RETURN_NAMES = ("chain",  "prompt",   "help",)
+    RETURN_TYPES = ("STRING", "STRING", "INT",  "FLOAT", "STRING",)
+    RETURN_NAMES = ("chain",  "prompt", "_int", "_flt",  "help",)
 
     #OUTPUT_NODE = True
 
@@ -118,6 +131,9 @@ class Shinsplat_GreenBox:
     CATEGORY = "advanced/Shinsplat"
 
     def select(self, text="", loop=False, enabled=True, chain="", start_over=False, seed=0):
+
+        if 'END' in text:
+            text = text.split("END")[0]
 
         clean = start_over
 
@@ -202,7 +218,22 @@ class Shinsplat_GreenBox:
 
         prompt += this_prompt
 
-        return(str(chains), prompt,  help)
+        # The _int and _flt can only be used as a single item so check the prompt for
+        # compatibility.
+        _int = 0
+        _flt = 0.0
+        str_num = prompt.strip()
+        try:
+            _int = int(str_num)
+            _flt = float(_int)
+        except:
+            pass
+        try:
+            _flt = float(str_num)
+        except:
+            pass
+
+        return(str(chains), prompt, _int, _flt, help)
 
 # --------------------------------------------------------------------------------
 #

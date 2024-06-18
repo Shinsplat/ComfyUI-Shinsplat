@@ -12,6 +12,9 @@ sinsplat_python:
 	6/9/2024
 		Run python code from a text node
 shinsplat_green_box
+	6/18/2024
+		Added interger and float to outputs, usefull when iterating
+		through a list of desirable seeds, cfg, etc.
 	6/16/2024
 		I added the "END" directive, everything after this uppercase term is ignored.
 	6/9/2024

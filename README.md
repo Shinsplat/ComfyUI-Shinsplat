@@ -233,6 +233,10 @@ Green Box
 	Just add one prompter per line, ending that particular prompt is done using
 	<enter>, which is equal to the "new line" character.
 
+	"_int/_flt" - output
+
+	Converts lines into these types on the respective outputs.
+
 ## END
 
 	Everything after this uppercase term is ignored.
