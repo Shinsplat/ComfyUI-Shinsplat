@@ -20,7 +20,7 @@ from .shinsplat_python import *
 from .shinsplat_python_more import *
 from .shinsplat_string_interpolated import *
 from .shinsplat_variables import *
-
+from .shinsplat_hex_to_other import *
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
@@ -36,6 +36,8 @@ NODE_CLASS_MAPPINGS = {
     "Python - More Inputs (Shinsplat)": Shinsplat_PythonMore,
     "String Interpolated (Shinsplat)": Shinsplat_StringInterpolated,
     "Variables (Shinsplat)": Shinsplat_Variables,
+    "Hex To Other (Shinsplat)": Shinsplat_HexToOther,
+
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Clip Text Encode (Shinsplat)": "Clip Text Encode (Shinsplat)",
@@ -48,6 +50,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Python - More Inputs (Shinsplat)": "Python - More Inputs (Shinsplat)",
     "String Interpolated (Shinsplat)": "String Interpolated (Shinsplat)",
     "Variables (Shinsplat)": "Variables (Shinsplat)",
+    "Hex To Other (Shinsplat)": "Hex To Other (Shinsplat)",
 }
 WEB_DIRECTORY = "./web"
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
