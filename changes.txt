@@ -1,3 +1,8 @@
+shinsplat_lora_loader:
+	6/20/2024
+		When clip and model weight were zero I forgot to return
+		expected values.  Fixed now.
+
 shinsplat_clip_text_encode_T5:
 	There's an SD3 version of this as well but I think I'll be working with this mostly
 	because SD3 is probably not viable and I won't need to do anything more than testing

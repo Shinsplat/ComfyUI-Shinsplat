@@ -76,6 +76,8 @@ class Shinsplat_LoraLoader:
         self, model, clip, lora_name, strength_model, strength_clip,
         pass_through=False, path_in="", prompt_in="", weight_model="", weight_clip=""):
 
+        path_out, prompt_out, triggers, meta_string = "", "", "", ""
+
         # If there's anything on the weights line the node has to re-run.
         weight_clip = weight_clip.strip()
         weight_model = weight_model.strip()
@@ -173,7 +175,7 @@ class Shinsplat_LoraLoader:
 
         # no weights to change.
         if strength_model == 0 and strength_clip == 0:
-            return (model, clip)
+            return (model, clip, path_out, prompt_out, triggers, meta_string)
 
         lora_path = folder_paths.get_full_path("loras", lora_name)
 
