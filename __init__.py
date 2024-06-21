@@ -42,7 +42,7 @@ NODE_CLASS_MAPPINGS = {
     "String Interpolated (Shinsplat)": Shinsplat_StringInterpolated,
     "Variables (Shinsplat)": Shinsplat_Variables,
     "Hex To Other (Shinsplat)": Shinsplat_HexToOther,
-    "Clip Tokens Encode (Shinsplat)": Shinsplat_CLIPTokensEncode,
+#    "Clip Tokens Encode (Shinsplat)": Shinsplat_CLIPTokensEncode,
 #    "Text To Tokens (Shinsplat)": Shinsplat_TextToTokens,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -58,7 +58,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "String Interpolated (Shinsplat)": "String Interpolated (Shinsplat)",
     "Variables (Shinsplat)": "Variables (Shinsplat)",
     "Hex To Other (Shinsplat)": "Hex To Other (Shinsplat)",
-    "Clip Tokens Encode (Shinsplat)": "Clip Tokens Encode (Shinsplat)",
+#    "Clip Tokens Encode (Shinsplat)": "Clip Tokens Encode (Shinsplat)",
 #    "Text To Tokens (Shinsplat)": "Text To Tokens (Shinsplat)",
 }
 WEB_DIRECTORY = "./web"
