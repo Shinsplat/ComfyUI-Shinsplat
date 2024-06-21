@@ -12,7 +12,8 @@ class Shinsplat_CLIPTextEncodeSD3:
     - Shinsplat Tarterbox -
 
     "END" - directive
-    When this is encountered nothing after it will be conditioned.
+    When this is encountered nothing after it will be conditioned.  This directive
+    can be used in clip_l, clip_g and t5xxl..
     """
 
     def __init__(self):
@@ -84,6 +85,7 @@ class Shinsplat_CLIPTextEncodeSD3:
             while len(tokens["l"]) > len(tokens["g"]):
                 tokens["g"] += empty["g"]
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
+
         return ([[cond, {"pooled_output": pooled}]], prompt_out)
 # --------------------------------------------------------------------------------
 #

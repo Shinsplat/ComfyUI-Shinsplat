@@ -1,3 +1,9 @@
+shinsplat_clip_tokesn_encode:
+	6/TBD/2024
+		Added a node that will take the output of tokens_out and
+		convert it into tensor blocks compatible with its associated
+		intent, i.e. SD/T5.
+
 shinsplat_lora_loader:
 	6/20/2024
 		When clip and model weight were zero I forgot to return
@@ -7,6 +13,13 @@ shinsplat_clip_text_encode_T5:
 	There's an SD3 version of this as well but I think I'll be working with this mostly
 	because SD3 is probably not viable and I won't need to do anything more than testing
 	and digging into the code and model, but anyway...
+
+	6/20/2024
+		Updated to change tokens_out to tokens_raw so that I can populate tokens_out
+		with the actual token values and weights, where I've also updated the SD
+		encoder to the same method.  These outputs are Pyton dictionary formatted
+		strings that can be evaluated into a list of dictionaries containing 1
+		token set per element.
 	6/14/2024
 		Updated so that the directives are not piped to the output "prompt_out".
 shinsplat_variables:
@@ -37,8 +50,12 @@ shinsplat_green_box
 		so hitting the <enter> after a prompt, like you'll find in
 		wildcard files, is the way to go.
 	6/8/2024
-		Added
+		Added (I was probably going to put something here, I don't remember what it was)
+
 shinsplat_clip_text_encode
+	6/20/2024
+		See T5.
+
 	6/17/2024
 		Updated to include the T5, 'END' directive is honored,
 		blocks are no longer needed in t5 so, while the blocks are

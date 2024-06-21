@@ -3,6 +3,7 @@ import os
 import json
 import comfy # initially to get a relative path
 import folder_paths
+from . import shinsplat_functions as sf
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
@@ -112,8 +113,8 @@ class Shinsplat_CLIPTextEncodeT5:
                         },
             }
 
-    RETURN_TYPES = ("CONDITIONING", "STRING", "STRING", )
-    RETURN_NAMES = ("CONDITIONING", "prompt_out", "tokens_out", )
+    RETURN_TYPES = ("CONDITIONING", "STRING",     "STRING",     "STRING", )
+    RETURN_NAMES = ("CONDITIONING", "prompt_out", "tokens_raw", "tokens_out", )
 
     FUNCTION = "encode"
 
@@ -126,7 +127,7 @@ class Shinsplat_CLIPTextEncodeT5:
         #prompt_after = prompt_after.split("END")[0]
 
         # ------------------------------------------------------------------------
-        print("t5xxl has been temporarily modified to include prompt_before/after : line 115", __file__)
+        print("t5xxl has been temporarily modified to include prompt_before/after : line 130", __file__)
         t5xxl = prompt_before + " " + t5xxl + " " + prompt_after
         # ------------------------------------------------------------------------
 # /
@@ -196,11 +197,6 @@ class Shinsplat_CLIPTextEncodeT5:
         # Don't pass the directives to other places, it's only for THIS node's use.
         for rd in remove_directives:
            prompt_out = prompt_out.replace(rd, "")
-# T
-        print("=================================")
-        print("prompt_out:", prompt_out)
-        print("=================================")
-# /
 
         # ------------------------------------------------------------------------
         #
@@ -237,11 +233,24 @@ class Shinsplat_CLIPTextEncodeT5:
                     tokens['t5xxl'][0].append(tup)
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
+
+
+        # ------------------------------------------------------------------------
+        # tokens_out
+        # ------------------------------------------------------------------------
+        # At this point I have the token values and weights.  I can send it along
+        # to the string generator that creates the invididual dictionaries, just
+        # like with SD, but note that I'm only converting T5 since I don't see
+        # a value in highly manipulating 'l' and 'g' at this point, maybe I'll
+        # revisit this later.
+
+        tokens_out = sf.tensors_to_tokens(tokens, 't5')
+
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
         # I can grab the tokens now and lookup the word portion.
-        tokens_out = ""
+        tokens_raw = ""
         # My testing shows that there's only 1 block, not broken up, despite that
         # it is formed similarly to the other clip doohickeys.
         if len(tokens['t5xxl']):
@@ -255,7 +264,7 @@ class Shinsplat_CLIPTextEncodeT5:
                 else:
                     word = self.tokens_rev[t]['token']
                     weight = self.tokens_rev[t]['weight']
-                    tokens_out += word + ":" + str(t) + ":" + str(weight) + "\n"
+                    tokens_raw += word + ":" + str(t) + ":" + str(weight) + "\n"
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
@@ -330,7 +339,7 @@ class Shinsplat_CLIPTextEncodeT5:
         #
         # ------------------------------------------------------------------------
 
-        return ([[cond, {"pooled_output": pooled}]], prompt_out, tokens_out)
+        return ([[cond, {"pooled_output": pooled}]], prompt_out, tokens_raw, tokens_out)
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import os
 import sys
 import json
 import folder_paths
+from . import shinsplat_functions as sf
 
 # --------------------------------------------------------------------------------
 #
@@ -64,32 +65,9 @@ class Shinsplat_CLIPTextEncode:
 
     DEBUG - directive
     self.debug = True # Releases the print
+
     WEIGHTS - directive
     self.show_weights = True # Shows the token weights
-
-
-    JSON_TOKENS - If this directive exists then your text is assumed to be a
-        JSON formatted string, where it will be analyzed for its token values.  The
-        input will be either strings or integers along with their weight.
-        {}
-
-    "NUMBER_TOKENS / STRING_TOKENS / CLEAN_TOKENS_STRINGS / CLEAN_TOKENS_NUMBERS"
-    Why these?  We can give weights to words, not tokens.  I haven't found an available
-    method to weight a single token, notably when that token is only a part of the
-    derivative of a single word.  I would like to weight all parts of the word
-    separately by manipulating the tokens instead of the word.
-
-    STRING_TOKENS - the evaluator expects string tokens as shown in the vocab file
-    NUMBER_TOKENS - the evaluator expects encoded tokens in numeric format
-    CLEAN_TOKENS_STRINGS - provides an output giving you an easy copy/paste method
-    CLEAN_TOKENS_NUMBERS - same, but the number tokens alone
-
-    The number tokens are actual numbers, text representations of integer values that
-    are the encoded token.  The string tokens directive tells the evaluator that you
-    are processing text tokens, as represented in the vocab file.  And clean tokens
-    tells the evaluator to output stripped text tokens so that you can more easily
-    copy and paste them back into your encoder, without the weights and formatting.
-
     """
 
     def log(self, m,  **kwargs):
@@ -131,7 +109,7 @@ class Shinsplat_CLIPTextEncode:
             }
 
     RETURN_TYPES = ("CONDITIONING", "STRING",       "STRING",       "STRING",       "STRING",)
-    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "tokens_raw",   "prompt_out",)
+    RETURN_NAMES = ("CONDITIONING", "tokens_count", "tokens_used",  "tokens_out",   "prompt_out",)
 
     FUNCTION = "encode"
 
@@ -148,10 +126,9 @@ class Shinsplat_CLIPTextEncode:
         # ------------------------------------------------------------------------
         # load tokens
         # ------------------------------------------------------------------------
-        # Get the actual words that were identified as tokens.  I'm always going
-        # to need this so may as well do it right away.
-        #
-        # Load the tokens file if it's not already in memory...
+        # This is done in shinsplat_functions but I use it here as well, to tell
+        # how many blocks there are and what was used.  This is NOT redundant
+        # but I could do better.
         file_name = "shinsplat_tokens.json"
         script_path = os.path.dirname(os.path.realpath(__file__))
         file_path = os.path.join(script_path, file_name)
@@ -436,7 +413,6 @@ class Shinsplat_CLIPTextEncode:
         # 1 from the total.  I just need to find the end token, which is 49407.
         #
         # I only have to tell them about one set of blocks because they are mirrored in the simpler clip encoder.
-
         tokens_count = ""
         last_token = "Null"
 
@@ -561,10 +537,16 @@ class Shinsplat_CLIPTextEncode:
         #
         # ------------------------------------------------------------------------
 
+# T
+
+        tokens_out = sf.tensors_to_tokens(tokens, "sd")
+        return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_out, prompt_out)
+# /
+
         # ------------------------------------------------------------------------
-        # raw tokens output
+        # formatted string tokens output
         # ------------------------------------------------------------------------
-        tokens_raw = ""
+        tokens_out = ""
         token_type = ""
         # I only need one set of tokens for this encoder, that can be 'l',
         # I'll first look for 'l', because it will have the proper end token,
@@ -582,6 +564,9 @@ class Shinsplat_CLIPTextEncode:
             # Each block is a list of tuples, each tuple contains the encoded token
             # and then its weight value (float).
             for block in tokens[token_type]:
+                # for the index, not really needed but could be helpful later
+                # to those that don't "Python" well.
+                tp_count = 0
                 for tensor_pair in block:
                     (t, w) = tensor_pair
                     # There is a start (49406) and end (49407) token identifier,
@@ -592,13 +577,16 @@ class Shinsplat_CLIPTextEncode:
                         break
                     # Get the string token associated with this token value.
                     token_value = tokens_dict[t]
-                    tokens_raw += "(" + token_value + ":" + str(t) + ":" + str(w) + ") "
 
-# T
-#        breakpoint()
-# /
+                    #tokens_out += "(" + token_value + ":" + str(t) + ":" + str(w) + ") "
+                    #tokens_out += '{\n    "token": ' + str(t) + ',\n' + '    "word": "' + token_value + ',\n' + '    "weight": ' + str(w) + ',\n'
+                    tokens_out += \
+                        '{"word": "' + token_value + '",' + ' "token": ' \
+                        + str(t) + ',' + ' "weight": ' + str(w) + '},' \
+                        + '"index": ' + str(tp_count) + '},\n'
+                    tp_count += 1
 
-        return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_raw, prompt_out)
+        return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_out, prompt_out)
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
