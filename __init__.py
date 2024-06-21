@@ -9,6 +9,7 @@
 ComfyUI Node alterations that I found useful in my own projects and for friends.
 """
 
+from .shinsplat_test_node import *
 from .shinsplat_clip_text_encode import *
 from .shinsplat_clip_text_encode_T5 import *
 from .shinsplat_clip_text_encode_SD3 import *
@@ -21,10 +22,14 @@ from .shinsplat_python_more import *
 from .shinsplat_string_interpolated import *
 from .shinsplat_variables import *
 from .shinsplat_hex_to_other import *
+from .shinsplat_clip_tokens_encode import *
+from .shinsplat_text_to_tokens import *
+
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
 NODE_CLASS_MAPPINGS = {
+    "Test Node (Shinsplat)": Shinsplat_TestNode,
     "Clip Text Encode (Shinsplat)": Shinsplat_CLIPTextEncode,
     "Clip Text Encode T5 (Shinsplat)": Shinsplat_CLIPTextEncodeT5,
     "Clip Text Encode SD3 (Shinsplat)": Shinsplat_CLIPTextEncodeSD3,
@@ -37,9 +42,11 @@ NODE_CLASS_MAPPINGS = {
     "String Interpolated (Shinsplat)": Shinsplat_StringInterpolated,
     "Variables (Shinsplat)": Shinsplat_Variables,
     "Hex To Other (Shinsplat)": Shinsplat_HexToOther,
-
+    "Clip Tokens Encode (Shinsplat)": Shinsplat_CLIPTokensEncode,
+#    "Text To Tokens (Shinsplat)": Shinsplat_TextToTokens,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "Test Node (Shinsplat)": "Test Node (Shinsplat)",
     "Clip Text Encode (Shinsplat)": "Clip Text Encode (Shinsplat)",
     "Clip Text Encode T5 (Shinsplat)": "Clip Text Encode T5 (Shinsplat)",
     "Clip Text Encode SD3 (Shinsplat)": "Clip Text Encode SD3 (Shinsplat)",
@@ -51,9 +58,13 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "String Interpolated (Shinsplat)": "String Interpolated (Shinsplat)",
     "Variables (Shinsplat)": "Variables (Shinsplat)",
     "Hex To Other (Shinsplat)": "Hex To Other (Shinsplat)",
+    "Clip Tokens Encode (Shinsplat)": "Clip Tokens Encode (Shinsplat)",
+#    "Text To Tokens (Shinsplat)": "Text To Tokens (Shinsplat)",
 }
 WEB_DIRECTORY = "./web"
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
+
+
