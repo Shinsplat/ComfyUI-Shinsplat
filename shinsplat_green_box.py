@@ -99,13 +99,8 @@ class Shinsplat_GreenBox:
         self.start = True # False after the first run so I know when to stop and recycle.
         prompts = []
 
-    def IS_CHANGED(s, **kwargs):
-        #self.trigger = not self.trigger
-        #return(self.trigger)
-        #return("junk")
-        # Not a number O.o, I still don't think this is necessary, I'll test a simple node when I have time.
-        # I believe something has to get returned but I see the same regurgitated malarkey, "hash" :/
-        return float("NaN")
+    def IS_CHANGED(c):
+        return
 
     @classmethod
     def INPUT_TYPES(s):
