@@ -60,13 +60,15 @@ class Shinsplat_Python:
     RETURN_TYPES = ("STRING",   "INT",      "FLOAT",     "BOOLEAN",  "STRING",)
     RETURN_NAMES = ("str_out",  "int_out",  "float_out", "bool_out", "help",)
 
-    #OUTPUT_NODE = True
+    OUTPUT_NODE = True
 
     FUNCTION = "run"
 
     CATEGORY = "advanced/Shinsplat"
 
     def run(self, text="", code="", enabled=True, str_in="", int_in=0, float_in=0.0, bool_in=False):
+
+        print("python node runs")
 
         # I need this in order to pass back changes to these containers from the compiled code.
         global str_out, int_out, float_out, bool_out

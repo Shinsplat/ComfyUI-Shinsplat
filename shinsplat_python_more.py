@@ -64,7 +64,7 @@ class Shinsplat_PythonMore:
     RETURN_TYPES = ("STRING",   "INT",      "FLOAT",     "BOOLEAN",  "STRING",)
     RETURN_NAMES = ("str_out",  "int_out",  "float_out", "bool_out", "help",)
 
-    #OUTPUT_NODE = True
+    OUTPUT_NODE = True
 
     FUNCTION = "run"
 
