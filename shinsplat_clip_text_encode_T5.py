@@ -244,7 +244,7 @@ class Shinsplat_CLIPTextEncodeT5:
         # a value in highly manipulating 'l' and 'g' at this point, maybe I'll
         # revisit this later.
 
-        tokens_out = sf.tensors_to_tokens(tokens, 't5')
+        tokens_out = sf.text_to_tokens(tokens)
 
         # ------------------------------------------------------------------------
         #

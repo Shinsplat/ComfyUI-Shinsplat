@@ -1,9 +1,18 @@
-shinsplat_clip_tokesn_encode:
-	6/TBD/2024
-		Added a node that will take the output of tokens_out and
+shinsplat_tensor_toys:
+	7/8/2024
+		See Tensor_Toys.txt for explanation.
+shinsplat_clip_tokens_encode:
+	7/8/2024
+		Added a node that will take the output of _tokens and
 		convert it into tensor blocks compatible with its associated
 		intent, i.e. SD/T5.
-
+		This also has a plugin for Tensor Toys.
+shinsplat_text_to_tokens (SD/XL/SD3)
+	7/8/2024
+		There are two versions, the plain one works for SD and SDXL then
+		there's the specific SD3 one as well, but the prior will work with
+		SD3 but with fewer options.  Combined with "tokens_encode" this
+		gives you token weight control.
 shinsplat_lora_loader:
 	6/20/2024
 		When clip and model weight were zero I forgot to return
@@ -17,7 +26,7 @@ shinsplat_clip_text_encode_T5:
 	6/20/2024
 		Updated to change tokens_out to tokens_raw so that I can populate tokens_out
 		with the actual token values and weights, where I've also updated the SD
-		encoder to the same method.  These outputs are Pyton dictionary formatted
+		encoder to the same method.  These outputs are Python dictionary formatted
 		strings that can be evaluated into a list of dictionaries containing 1
 		token set per element.
 	6/14/2024
@@ -33,11 +42,16 @@ shinsplat_string_interpolated:
 		I enabled dynamic prompts and added the END
 		directive.
 sinsplat_python:
+	7/1/2024
+		Added a check and warning, issuing a messag
+		on first run, of the dangers easily exposed
+		to a user from running an unknown work-flow.
+		This stops the process on first run.
 	6/9/2024
 		Run python code from a text node
 shinsplat_green_box
 	6/18/2024
-		Added interger and float to outputs, usefull when iterating
+		Added integer and float to outputs, useful when iterating
 		through a list of desirable seeds, cfg, etc.
 	6/16/2024
 		I added the "END" directive, everything after this uppercase term is ignored.

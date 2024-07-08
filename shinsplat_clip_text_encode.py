@@ -537,54 +537,10 @@ class Shinsplat_CLIPTextEncode:
         #
         # ------------------------------------------------------------------------
 
+        tokens_out = sf.text_to_tokens(tokens)
 # T
-
-        tokens_out = sf.tensors_to_tokens(tokens, "sd")
-        return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_out, prompt_out)
+#        breakpoint()
 # /
-
-        # ------------------------------------------------------------------------
-        # formatted string tokens output
-        # ------------------------------------------------------------------------
-        tokens_out = ""
-        token_type = ""
-        # I only need one set of tokens for this encoder, that can be 'l',
-        # I'll first look for 'l', because it will have the proper end token,
-        # then 'h', then 'g'.  I figure 'h' probably has an end token since
-        # it's alone but I haven't tested that yet.
-        if 'l' in tokens:
-            token_type = 'l'
-        elif 'h' in tokens:
-            token_type = 'h'
-        elif 'g' in tokens:
-            token_type = 'g'
-        else:
-            self.log("no token type found")
-        if token_type != "":
-            # Each block is a list of tuples, each tuple contains the encoded token
-            # and then its weight value (float).
-            for block in tokens[token_type]:
-                # for the index, not really needed but could be helpful later
-                # to those that don't "Python" well.
-                tp_count = 0
-                for tensor_pair in block:
-                    (t, w) = tensor_pair
-                    # There is a start (49406) and end (49407) token identifier,
-                    # I want everything in between but not those.
-                    if t == 49406:
-                        continue
-                    if t == 49407:
-                        break
-                    # Get the string token associated with this token value.
-                    token_value = tokens_dict[t]
-
-                    #tokens_out += "(" + token_value + ":" + str(t) + ":" + str(w) + ") "
-                    #tokens_out += '{\n    "token": ' + str(t) + ',\n' + '    "word": "' + token_value + ',\n' + '    "weight": ' + str(w) + ',\n'
-                    tokens_out += \
-                        '{"word": "' + token_value + '",' + ' "token": ' \
-                        + str(t) + ',' + ' "weight": ' + str(w) + '},' \
-                        + '"index": ' + str(tp_count) + '},\n'
-                    tp_count += 1
 
         return ([[cond, {"pooled_output": pooled}]], tokens_count, tokens_used, tokens_out, prompt_out)
 # --------------------------------------------------------------------------------

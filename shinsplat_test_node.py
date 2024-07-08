@@ -25,10 +25,10 @@ class Shinsplat_TestNode:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "in1_": ("STRING", {"multiline": True, "dynamicPrompts": False}),
+                "text_": ("STRING", {"multiline": True, "dynamicPrompts": False}),
                 },
             "optional": {
-                        "in2_": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
+                        "in_": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
                         },
             }
 
@@ -39,34 +39,20 @@ class Shinsplat_TestNode:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def test(self, in1_="", in2_=""):
+    def IS_CHANGED(c):
+        return
 
-        out_ = "nothing  yet"
+    def test(self, text_="", in_=""):
 
-        return(out_)
+        print("=====================================")
+        print("test node runs")
+        print("=====================================")
 
+        #self.trigger = not self.trigger
 
-"""
-class VAEDecode:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": { "samples": ("LATENT", ), "vae": ("VAE", )}}
-    RETURN_TYPES = ("IMAGE",)
-    FUNCTION = "decode"
+        out_ = in_ + " " + text_
 
-    CATEGORY = "latent"
-
-    def decode(self, vae, samples):
-        return (vae.decode(samples["samples"]), )
-"""
-
-
-
-
-
-
-
-
+        return(out_,)
 
 # --------------------------------------------------------------------------------
 #

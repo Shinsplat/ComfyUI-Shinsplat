@@ -82,7 +82,7 @@ class Shinsplat_GreenBox:
     Pipe these node together using this, ultimately ending in the "prompt" output.
 
     - _int, _flt -
-    An attempt will be nade to produce integers and floating points for these outputs.
+    An attempt will be made to produce integers and floating points for these outputs.
     I initially added these so that I could iterate generations using the same seed
     for a specific number of generations, so that I could add different prompts or
     in put, for those/that same seeds.

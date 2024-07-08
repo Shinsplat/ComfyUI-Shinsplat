@@ -1,0 +1,42 @@
+
+This set of tools is a bit too much to document in the general read me file so I've created this to outline the features specifically for this set of  tools and accompaniments.
+
+First...
+
+- WARNING -
+
+I'm giving you a shovel, what you find is your own fault.
+
+I cannot protect you against an experience that may be distasteful to you.  Basically, if you believe yourself to be protected against NSFW material then get out of my house NOW!  Stop reading, go away and never return!
+
+It is not my intention to specifically target NSFW material but if it's in the model you're using then there's a chance you'll be exposed to it even if that model has never produced this type of material before.  No set of negative prompts will save you because the nature of this tool is to go beyond your prompts, negative, positive or image guidance.  This tool's ability is as mysterious as the data contained within a model structure.  While we may know how the implementation works, nobody knows how the internals of a neuro network produces its results.
+
+In addition to this tool there's another one that's required in order to utilize it, it's effectively a tokenizer.  It takes the data produced by the back-end and restructures it to fit into what I believe it was intended to be.  My experimentation tells me that the data produced by the back-end tokenizer is faulty and gets worse with each implementation from SD to XL to SD3 (SD3 is the worst culprit).  So this tokenizer will adjust the encoded tokens before sending it to the KSampler.  If you're using one of my encoders then it's likely you'll notice a difference in your image output using the same parameters (seed etc.), and this is the reason why.  My encoders will produce a different image as often as the back-end produces its confusing data.
+
+I've setup a template system so that parameters can be loaded into the controller, altered and saved.  You can build your own templates, modify existing ones and hand them out if you like.  However, if a template is usually producing acceptable material it does not mean that it's incapable of disappointing you later.  The idea is to bypass what we're used to seeing and dig into what might be more refined, better quality or even just entertaining chaos.
+
+- setup -
+
+Add "Tensor Toys (Shinsplat)" to your work-flow, you can adjust settings and pipe them into the "Clip Tokens Encode".  You can use a "String Literal" to generate your module/dictionary and pipe that into the CTE, or use the included TT Controller to fiddle with your parameters.
+
+First the node-set and what they do.
+
+Text To Tokens (Shinsplat)
+
+	This will convert your tokens into their encoded representation and offer that Python dictionary on its output "_tokens".  This is readable text, a string, that is then expected to be piped into the "Clip Tokens Encode (Shinsplat)".  CTE is your replacement for CLIPTextEncode in this work-flow.  Note that there is a "Text To Tokens SD3 (Shinsplat)" as well and it's value is just the outputs that you can pipe into another encoder prompt areas because it contains the various clip data, but you do not need it for this implementation, only for duplicated prompt output for other stages that are NOT "token encoded".  Tensor Toys will work with SD 1.5, XL and SD3 (SD3 is where I did most of my testing).
+
+	The non-SD3 version IS SD3 compatible but for Tensor Toys the SD3 version is not necessary.  The basic "Text To Tokens (Shinsplat)" is fully functional for SD3 and backwards compatible.  This has a regular text output on "_prompt" that you can pipe into a normal encoder, which is convenient for testing other stages prior to SD3.
+
+	In addition, the output of this _tokens port can be altered in order to weight each token, instead of each word.  Words are sometimes broken up in order to encode them and weighting individual tokens can give some very different, and unexpected, results.  Since the output of the _tokens port is a structured data, Python dictionary, you can programmatically alter it, I would suggest one of my Python nodes.  Each token line can be identified by its word, its encoded token and an index in order to dig in directly to the data you want to access.
+
+Clip Tokens Encode (Shinsplat)
+
+	This receives the token data from "Text To Tokens (Shinsplat)" output "_tokens".  This is connected to your work-flow, just like the CLIPTextEncode node would be, but has additional features.
+
+	_control - this is the condition controller (module container) and is expected to be a Python dictionary or the "Tensor Toys" node.
+	_tokens - this is a Python dictionary, the actual tensor tokens that are sent to the KSampler, for you to examine.
+
+Tensor Toys (Shinsplat)
+
+	This node generates a Python dictionary suitable for the Clip Tokens Encode (Shinsplat) node for its input port "_tokens".
+

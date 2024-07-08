@@ -1,6 +1,8 @@
 # Shinsplat Tarterbox
-
+import os
+import sys
 import traceback
+from . import shinsplat_functions as sf
 
 debug = False
 
@@ -35,8 +37,7 @@ class Shinsplat_Python:
             print(m)
 
     def __init__(self):
-        # trigger is just a switch for each rerun
-        self.trigger = False
+        self.warning_issued = False
 
     def IS_CHANGED(s, **kwargs):
         return("junk")
@@ -47,7 +48,7 @@ class Shinsplat_Python:
         return {
                     "required": {
                         "code": ("STRING", {"default": help, "multiline": True, "dynamicPrompts": False}),
-                        "enabled": ("BOOLEAN", {"default": True}),
+                        "enabled": ("BOOLEAN", {"default": False}),
                     },
                     "optional": {
                         "str_in": ("STRING", {"default": help, "multiline": True, "dynamicPrompts": False, "forceInput": True}),
@@ -66,9 +67,18 @@ class Shinsplat_Python:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def run(self, text="", code="", enabled=True, str_in="", int_in=0, float_in=0.0, bool_in=False):
+    def run(self, text="", code="", enabled=False, str_in="", int_in=0, float_in=0.0, bool_in=False):
 
-        print("python node runs")
+        # A few steps to ensure the message was issued
+        if enabled == True:
+            if self.warning_issued == False:
+                myPath = os.path.dirname(__file__)
+                myFile = os.path.join(myPath, sf.python_warning_file)
+                if not os.path.isfile(myFile):
+                    self.warning_issued = True
+                    f = open(myFile, "w")
+                    f.close()
+                    raise Exception(sf.python_warning)
 
         # I need this in order to pass back changes to these containers from the compiled code.
         global str_out, int_out, float_out, bool_out

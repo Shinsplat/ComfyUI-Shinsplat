@@ -2,11 +2,12 @@
 
 """
 @author: Shinsplat
-@title: ComfyUI-Shinsplat
+@title: Shinsplat
 @nickname: shinsplat
 @description:
-
-ComfyUI Node alterations that I found useful in my own projects and for friends.
+whatever
+@license:
+If you infer one you're making a mistake.  Your output belongs to you, the code belongs to, most likely not you.
 """
 
 from .shinsplat_test_node import *
@@ -24,6 +25,8 @@ from .shinsplat_variables import *
 from .shinsplat_hex_to_other import *
 from .shinsplat_clip_tokens_encode import *
 from .shinsplat_text_to_tokens import *
+from .shinsplat_text_to_tokens_SD3 import *
+from .shinsplat_tensor_toys import *
 
 # --------------------------------------------------------------------------------
 #
@@ -34,6 +37,10 @@ NODE_CLASS_MAPPINGS = {
     "Clip Text Encode T5 (Shinsplat)": Shinsplat_CLIPTextEncodeT5,
     "Clip Text Encode SD3 (Shinsplat)": Shinsplat_CLIPTextEncodeSD3,
     "Clip Text Encode SDXL (Shinsplat)": Shinsplat_CLIPTextEncodeSDXL,
+    "Clip Tokens Encode (Shinsplat)": Shinsplat_CLIPTokensEncode,
+    "Tensor Toys (Shinsplat)": Shinsplat_TensorToys,
+    "Text To Tokens (Shinsplat)": Shinsplat_TextToTokens,
+    "Text To Tokens SD3 (Shinsplat)": Shinsplat_TextToTokensSD3,
     "Lora Loader (Shinsplat)": Shinsplat_LoraLoader,
     "Sum Wrap (Shinsplat)": Shinsplat_SumWrap,
     "Green Box (Shinsplat)": Shinsplat_GreenBox,
@@ -42,8 +49,6 @@ NODE_CLASS_MAPPINGS = {
     "String Interpolated (Shinsplat)": Shinsplat_StringInterpolated,
     "Variables (Shinsplat)": Shinsplat_Variables,
     "Hex To Other (Shinsplat)": Shinsplat_HexToOther,
-#    "Clip Tokens Encode (Shinsplat)": Shinsplat_CLIPTokensEncode,
-#    "Text To Tokens (Shinsplat)": Shinsplat_TextToTokens,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Test Node (Shinsplat)": "Test Node (Shinsplat)",
@@ -51,6 +56,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Clip Text Encode T5 (Shinsplat)": "Clip Text Encode T5 (Shinsplat)",
     "Clip Text Encode SD3 (Shinsplat)": "Clip Text Encode SD3 (Shinsplat)",
     "Clip Text Encode SDXL (Shinsplat)": "Clip Text Encode SDXL (Shinsplat)",
+    "Clip Tokens Encode (Shinsplat)": "Clip Tokens Encode (Shinsplat)",
+    "Tensor Toys (Shinsplat)": "Tensor Toys (Shinsplat)",
+    "Text To Tokens (Shinsplat)": "Text To Tokens (Shinsplat)",
+    "Text To Tokens SD3 (Shinsplat)": "Text To Tokens SD3 (Shinsplat)",
     "Lora Loader (Shinsplat)": "Lora Loader (Shinsplat)",
     "Green Box (Shinsplat)": "Green Box (Shinsplat)",
     "Python (Shinsplat)": "Python (Shinsplat)",
@@ -58,13 +67,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "String Interpolated (Shinsplat)": "String Interpolated (Shinsplat)",
     "Variables (Shinsplat)": "Variables (Shinsplat)",
     "Hex To Other (Shinsplat)": "Hex To Other (Shinsplat)",
-#    "Clip Tokens Encode (Shinsplat)": "Clip Tokens Encode (Shinsplat)",
-#    "Text To Tokens (Shinsplat)": "Text To Tokens (Shinsplat)",
 }
 WEB_DIRECTORY = "./web"
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
-
-

@@ -3,20 +3,14 @@
 import ast
 import traceback
 
-# --------------------------------------------------------------------------------
-#
-# --------------------------------------------------------------------------------
-class Shinsplat_Variables:
-    """
-    - Shinsplat Tarterbox -
-
+help = """
     # Make sure to use a comma (,) after each variable section or it will not
     parse correctly, you will get an error.  This is effectively converted into
     JSON, or a simple Python dictionary.
 
     # The first part is the key, the variable.  The source text will have its
     same name replaced by the text, but in he source text you'll add a $ to it.
-    For example, the assignments below will have its counterpart desribed as
+    For example, the assignments below will have its counterpart described as
 
     $THIS
     $THAT
@@ -36,6 +30,14 @@ class Shinsplat_Variables:
     # a better choice since the evaluator is designed to utilize lower case tokens.
     # Any uppercase characters are reduced to their lowercase counterparts before
     # being tokenized.
+"""
+
+# --------------------------------------------------------------------------------
+#
+# --------------------------------------------------------------------------------
+class Shinsplat_Variables:
+    """
+    - Shinsplat Tarterbox -
     """
 
     def __init__(self):
@@ -54,8 +56,8 @@ class Shinsplat_Variables:
 
            }
 
-    RETURN_TYPES = ("STRING", )
-    RETURN_NAMES = ("STRING", )
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("STRING", "help")
 
     FUNCTION = "variables"
 
@@ -77,7 +79,7 @@ class Shinsplat_Variables:
             fake_v = "$" + k
             t_out = t_out.replace(fake_v, real_dict[k])
 
-        return (t_out,)
+        return (t_out, help,)
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------

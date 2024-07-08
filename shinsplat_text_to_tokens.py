@@ -6,11 +6,17 @@ import folder_paths
 from . import shinsplat_functions as sf
 
 help ="""
+# before_ / after_ are inputs that will sandwich the
+# main text area and is standard text.
+# _prompt
+# is standard text output, not formatted tokens.
+# _tokens
+# is a text representation of a list of dictionaries
+# representing values of tokens.  Pipe this through
+# Clip Tokens Encode.
+#
 # This is a commented line, you can include it in your
 # token definitions to keep notes.
-#
-# This is for generating compatible tokens ONLY.  There's
-# a "clip" out for convenience, to help limit your chains.
 #
 # This tool is just a text input that converts your
 # words into encoded tokens for the output.  I works
@@ -101,23 +107,22 @@ class Shinsplat_TextToTokens:
                         },
             }
 
-    RETURN_TYPES = ("CLIP", "STRING",  "STRING", )
-    RETURN_NAMES = ("clip", "_prompt", "_tokens", )
+    RETURN_TYPES = ("STRING",  "STRING", )
+    RETURN_NAMES = ("_prompt", "_tokens", )
 
     FUNCTION = "to_tokens"
 
     CATEGORY = "advanced/Shinsplat"
 
     def to_tokens(self, clip, text, before_="", after_=""):
-        tokens_out = "NOTHING PROCESSED"
-        p = before_ + text + after_
-        tokens = clip.tokenize(p)
-        method = "sd"
-        if "t5xxl" in tokens:
-            method = "t5"
-        # Call the function that creates tensors so
-        tokens_out = sf.tensors_to_tokens(tokens, method)
-        return (clip, p, tokens_out)
+
+        text = text.split("END")[0]
+        before_ = before_.split("END")[0]
+        after_ = after_.split("END")[0]
+        prompt_local = before_ + " " + text + " " + after_
+        tokens = clip.tokenize(prompt_local)
+        tokens_out = sf.text_to_tokens(tokens)
+        return (text, tokens_out,)
 
 # --------------------------------------------------------------------------------
 #

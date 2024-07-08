@@ -266,11 +266,47 @@ Hex to Other
 	Convert a string representation of a hex value to an integer/float outpuot.
 
 
+Text To Tokens
 
+	before_ / after_
 
+	Provides two inputs for standard text prompting.  Provides a standard text output
+	that will contain the sandwiched text area between before_ and after_.
 
+	tokens_
 
+	This outputs a text representation of tokenized values that the CLIP Tokens Encode
+	node can utilize.  These tokens are split words, understood by the evaluator.  The
+	utilization of this is to be able to weight the resulting tokens separately, instead
+	of each split word being its full defined weight.  For instance, the word unrelenting
+	will be broken up into 3 tokens, (un, rel, enting), and the Text To Tokens promcess,
+	along with the Tokens Encode, will allow for weighting each of these encoded values
+	separately.
 
+	Example output:
 
+		{"word": "un", "token": 569, "weight": 1.0, "clip": "g", "index": 0},
+		{"word": "rel", "token": 1825, "weight": 1.0, "clip": "g", "index": 1},
+		{"word": "enting</w>", "token": 20526, "weight": 1.0, "clip": "g", "index": 2},
+		{"word": "un", "token": 569, "weight": 1.0, "clip": "l", "index": 0},
+		{"word": "rel", "token": 1825, "weight": 1.0, "clip": "l", "index": 1},
+		{"word": "enting</w>", "token": 20526, "weight": 1.0, "clip": "l", "index": 2},
 
+	The output will be different depending on the clip in use.  I should have this working
+	with t5xxl, SD 1.5, SD3 and Cascade.  If it doesn't work then I goofed up somewhere,
+	I'd appreciate if someone lets me know.
 
+CLIP Tokens Encode *more below
+
+Tensor Toys / Text To Tokens / Clip Tokens Encode
+
+	These work together though you don't actually need Tensor Toys to use the TT pair.
+	See the file Tensor_Toys.txt for more information or look at the header of
+	shinsplat_tensor_toys.py.
+
+	Basically Tensor Toys gives you control over how the weights are prepared, or offered
+	at all, to the rest of your work-flow.  Using a zero weight feature, without a prompt,
+	will give you "themed" material based on the images that were used to train the model.
+
+	There are other parameters that will dig deeper into the model, the results are not
+	guaranteed to be SFW, what you find is your own fault.
