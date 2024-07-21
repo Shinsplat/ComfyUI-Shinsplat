@@ -10,24 +10,23 @@ whatever
 If you infer one you're making a mistake.  Your output belongs to you, the code belongs to, most likely not you.
 """
 
-from .shinsplat_test_node import *
-from .shinsplat_clip_text_encode import *
-from .shinsplat_clip_text_encode_T5 import *
-from .shinsplat_clip_text_encode_SD3 import *
-from .shinsplat_clip_text_encode_sdxl import *
-from .shinsplat_lora_loader import *
-from .shinsplat_sum_wrap import *
-from .shinsplat_green_box import *
-from .shinsplat_python import *
-from .shinsplat_python_more import *
-from .shinsplat_string_interpolated import *
-from .shinsplat_variables import *
-from .shinsplat_hex_to_other import *
-from .shinsplat_clip_tokens_encode import *
-from .shinsplat_text_to_tokens import *
-from .shinsplat_text_to_tokens_SD3 import *
-from .shinsplat_tensor_toys import *
-
+from .test_node import *
+from .clip_text_encode import *
+from .clip_text_encode_T5 import *
+from .clip_text_encode_SD3 import *
+from .clip_text_encode_sdxl import *
+from .lora_loader import *
+from .sum_wrap import *
+from .green_box import *
+from .python import *
+from .python_more import *
+from .string_interpolated import *
+from .variables import *
+from .hex_to_other import *
+from .clip_tokens_encode import *
+from .text_to_tokens import *
+from .text_to_tokens_SD3 import *
+from .tensor_toys import *
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
