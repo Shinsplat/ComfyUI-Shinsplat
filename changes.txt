@@ -50,6 +50,10 @@ sinsplat_python:
 	6/9/2024
 		Run python code from a text node
 shinsplat_green_box
+	7/21/2024
+		Added a random feature to the list of items.  It will grab
+		the entire list first, randomize the list, then iterate through
+		that list in order to prevent unnecessary repeats per list.
 	6/18/2024
 		Added integer and float to outputs, useful when iterating
 		through a list of desirable seeds, cfg, etc.
