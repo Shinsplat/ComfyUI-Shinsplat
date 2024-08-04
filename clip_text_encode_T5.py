@@ -68,8 +68,15 @@ class Shinsplat_CLIPTextEncodeT5:
     def __init__(self):
         self.debug = False
         # Make a couple of lookup tables for the tokens.
-        base_path = comfy.__path__[0]
-        tok_f = os.path.join(base_path, "t5_tokenizer", "tokenizer.json")
+
+        # UPDATE: 8/4/2024 - moved or removed
+        #base_path = comfy.__path__[0]
+        #tok_f = os.path.join(base_path, "t5_tokenizer", "tokenizer.json")
+        # -
+        file_name = "t5_tokenizer.json"
+        script_path = os.path.dirname(os.path.realpath(__file__))
+        tok_f = os.path.join(script_path, file_name)
+
         tf = open(tok_f, "r", encoding="utf-8")
         content = tf.read()
         tf.close()

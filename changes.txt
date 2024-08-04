@@ -23,6 +23,8 @@ shinsplat_clip_text_encode_T5:
 	because SD3 is probably not viable and I won't need to do anything more than testing
 	and digging into the code and model, but anyway...
 
+	8/4/2024
+		T5 moved or removed, I just copied the silly thing.
 	6/20/2024
 		Updated to change tokens_out to tokens_raw so that I can populate tokens_out
 		with the actual token values and weights, where I've also updated the SD
