@@ -39,8 +39,9 @@ class Shinsplat_TestNode:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def IS_CHANGED(c):
-        return
+    @classmethod
+    def IS_CHANGED(self, **kwargs):
+        return float("nan")
 
     def test(self, text_="", in_=""):
 

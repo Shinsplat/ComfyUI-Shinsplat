@@ -136,11 +136,6 @@ class Shinsplat_TensorToys:
     def __init__(self):
         self.trigger = False
 
-#    @classmethod
-#    def IS_CHANGED(s):
-#        #return self.trigger
-#        return "dumb"
-
     @classmethod
     def INPUT_TYPES(s):
         return {

@@ -29,9 +29,6 @@ class Shinsplat_CLIPTokensEncode:
         self.before_ = ""
         self.after_ = ""
 
-#    def IS_CHANGED(s, **kwargs):
-#        return("junk")
-
     @classmethod
     def INPUT_TYPES(s):
         return {

@@ -39,8 +39,9 @@ class Shinsplat_Python:
     def __init__(self):
         self.warning_issued = False
 
-    def IS_CHANGED(s, **kwargs):
-        return("junk")
+    @classmethod
+    def IS_CHANGED(self, **kwargs):
+        return float("nan")
 
     @classmethod
     def INPUT_TYPES(s):

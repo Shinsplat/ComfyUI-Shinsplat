@@ -49,8 +49,9 @@ class Shinsplat_SumWrap:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def IS_CHANGED(s, **kwargs):
-        return("junk")
+    @classmethod
+    def IS_CHANGED(self, **kwargs):
+        return float("nan")
 
     def wrap(self, start=0, step=1, ceiling=1, wrap=1, clear=False):
 

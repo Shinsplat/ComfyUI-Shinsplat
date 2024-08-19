@@ -96,12 +96,13 @@ class Shinsplat_GreenBox:
 
     def __init__(self):
         # trigger is just a switch for each rerun
-        #self.trigger = False
+        self.trigger = False
         self.start = True # False after the first run so I know when to stop and recycle.
         prompts = []
 
-    def IS_CHANGED(c):
-        return
+    @classmethod
+    def IS_CHANGED(self, **kwargs):
+        return float("nan")
 
     @classmethod
     def INPUT_TYPES(s):

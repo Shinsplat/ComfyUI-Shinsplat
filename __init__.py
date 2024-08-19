@@ -27,6 +27,9 @@ from .clip_tokens_encode import *
 from .text_to_tokens import *
 from .text_to_tokens_SD3 import *
 from .tensor_toys import *
+from .seed import *
+from .nupoma import *
+from .ksampler import *
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
@@ -48,6 +51,9 @@ NODE_CLASS_MAPPINGS = {
     "String Interpolated (Shinsplat)": Shinsplat_StringInterpolated,
     "Variables (Shinsplat)": Shinsplat_Variables,
     "Hex To Other (Shinsplat)": Shinsplat_HexToOther,
+    "Seed (Shinsplat)": Shinsplat_Seed,
+    "Nupoma (Shinsplat)": Shinsplat_Nupoma,
+    "KSampler (Shinsplat)": Shinsplat_KSampler,
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Test Node (Shinsplat)": "Test Node (Shinsplat)",
@@ -66,6 +72,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "String Interpolated (Shinsplat)": "String Interpolated (Shinsplat)",
     "Variables (Shinsplat)": "Variables (Shinsplat)",
     "Hex To Other (Shinsplat)": "Hex To Other (Shinsplat)",
+    "Seed (Shinsplat)": "Seed (Shinsplat)",
+    "Nupoma (Shinsplat)": "Nupoma (Shinsplat)",
+    "KSampler (Shinsplat)": "KSampler (Shinsplat)",
 }
 WEB_DIRECTORY = "./web"
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
