@@ -43,14 +43,6 @@ shinsplat_string_interpolated:
 		The existing text nodes didn't fit my needs,
 		I enabled dynamic prompts and added the END
 		directive.
-sinsplat_python:
-	7/1/2024
-		Added a check and warning, issuing a messag
-		on first run, of the dangers easily exposed
-		to a user from running an unknown work-flow.
-		This stops the process on first run.
-	6/9/2024
-		Run python code from a text node
 shinsplat_green_box
 	7/21/2024
 		Added a random feature to the list of items.  It will grab
