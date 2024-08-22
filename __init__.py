@@ -18,8 +18,6 @@ from .clip_text_encode_sdxl import *
 from .lora_loader import *
 from .sum_wrap import *
 from .green_box import *
-from .python import *
-from .python_more import *
 from .string_interpolated import *
 from .variables import *
 from .hex_to_other import *
@@ -46,8 +44,6 @@ NODE_CLASS_MAPPINGS = {
     "Lora Loader (Shinsplat)": Shinsplat_LoraLoader,
     "Sum Wrap (Shinsplat)": Shinsplat_SumWrap,
     "Green Box (Shinsplat)": Shinsplat_GreenBox,
-    "Python (Shinsplat)": Shinsplat_Python,
-    "Python - More Inputs (Shinsplat)": Shinsplat_PythonMore,
     "String Interpolated (Shinsplat)": Shinsplat_StringInterpolated,
     "Variables (Shinsplat)": Shinsplat_Variables,
     "Hex To Other (Shinsplat)": Shinsplat_HexToOther,
@@ -67,8 +63,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Text To Tokens SD3 (Shinsplat)": "Text To Tokens SD3 (Shinsplat)",
     "Lora Loader (Shinsplat)": "Lora Loader (Shinsplat)",
     "Green Box (Shinsplat)": "Green Box (Shinsplat)",
-    "Python (Shinsplat)": "Python (Shinsplat)",
-    "Python - More Inputs (Shinsplat)": "Python - More Inputs (Shinsplat)",
     "String Interpolated (Shinsplat)": "String Interpolated (Shinsplat)",
     "Variables (Shinsplat)": "Variables (Shinsplat)",
     "Hex To Other (Shinsplat)": "Hex To Other (Shinsplat)",
