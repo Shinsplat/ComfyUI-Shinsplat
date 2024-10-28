@@ -26,8 +26,6 @@ from .text_to_tokens import *
 from .text_to_tokens_SD3 import *
 from .tensor_toys import *
 from .seed import *
-from .nupoma import *
-from .ksampler import *
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
