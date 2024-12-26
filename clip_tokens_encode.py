@@ -90,6 +90,14 @@ class Shinsplat_CLIPTokensEncode:
             # what clip is this and is something missing?
             tokens_ref = clip.tokenize("")
 
+# T
+#dog
+            if 'l' in tokens_ref and 'l' not in tokens:
+                clip_l_tokens = clip.tokenize("")
+                tokens['l'] = clip_l_tokens['l']
+# /
+
+
             # ------------------------------------------------------------------
             # rerun
             # ------------------------------------------------------------------

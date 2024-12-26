@@ -37,6 +37,10 @@ class Shinsplat_CLIPTextEncode:
     The usefulness of this for me was that I can have the same prompt in mulitple
     segments easily.
 
+    Clip_L is enabled by default, allowing the expected text to be duplicated cross
+    to t5 as well.  However, my experience shows that clip_l can introduce artifacts
+    and hallucinations so I personally choose not to use it so I created this option.
+
     Pony tags will not be included in the output text, prompt.  However, the input
     text "prompt_before" and "prompt_after" will be added to the "prompt".
 
@@ -100,6 +104,7 @@ class Shinsplat_CLIPTextEncode:
             "required": {
                 "text": ("STRING", {"multiline": True, "dynamicPrompts": True}),
                 "clip": ("CLIP", ),
+                "clip_l": ("BOOLEAN", {"default": True}),
                 "pony": ("BOOLEAN", {"default": False}),
                 },
             "optional": {
@@ -115,7 +120,7 @@ class Shinsplat_CLIPTextEncode:
 
     CATEGORY = "advanced/Shinsplat"
 
-    def encode(self, clip, text, pony=False, prompt_before="", prompt_after="",):
+    def encode(self, clip, text, clip_l=True, pony=False, prompt_before="", prompt_after="",):
 
         # NOTE: I'm going to need 'l' and possibly 'g' for t5, and this is NOT
         # an SDXL specific encoder so I should be able to duplicate one into
@@ -261,6 +266,24 @@ class Shinsplat_CLIPTextEncode:
         # There are no blocks in t5, it's all one segment.
         t5xxl_block = start_block.replace("BREAK", "")
 
+        # ------------------------------------------------------------------------
+        # I've encoded t5 by now, I think I needed to ensure that this was done first
+        # ------------------------------------------------------------------------
+        # Disable clip_l processing if clip_l == False, so we only use t5.
+        # UPDATE: 12/26/2024 - That seemed to work, I'll goof with it for awhile
+        if clip_l == False:
+            # Clip Tokens Encode (Shinsplat) had to be altered, see "kludge" in there.
+            # The clip 'l' is necessary to be sent to the ksampler apparently, though
+            # why we use 'l' anymore isn't clear.  Anyway, I generate a blank block
+            # in the CTE if the clip expects 'l' and it's not present in 'tokens'.
+            # Blank this out since we don't need, and don't want to reflect the use of,
+            # 'l' clip.
+            text_blocks = ['']
+        # ------------------------------------------------------------------------
+        #
+        # ------------------------------------------------------------------------
+
+
         # Iterate over each block and have the clip encode their types.
         for block in text_blocks:
             # I won't create an entire block for white-space.
@@ -312,8 +335,6 @@ class Shinsplat_CLIPTextEncode:
                     for tensor_block in temp_tokens['g']:
                         tokens['g'].append(tensor_block)
 
-
-
         # ------------------------------------------------------------------------
         #
         # ------------------------------------------------------------------------
@@ -337,8 +358,6 @@ class Shinsplat_CLIPTextEncode:
         #
         # If tokens_input is not an empty string then I need an empty token container
         # for the clip type.
-
-# working on it !
 
         if tokens_input != "":
             self.log("raw tokens input:" + tokens_input)
