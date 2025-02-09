@@ -1,3 +1,7 @@
+shinsplat_clip_text_encode_alt:
+	2/9/2025
+		A simple conversion of the text encoder to recognize the END
+		directive and provide nodes for Green Box and an prompt output.
 shinsplat_tensor_toys:
 	7/8/2024
 		See Tensor_Toys.txt for explanation.

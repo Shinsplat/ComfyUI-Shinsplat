@@ -29,10 +29,14 @@ from .seed import *
 from .nupoma import *
 from .ksampler import *
 from .clip_text_encode_flux import *
+from .upscale_webp import *
+from .clip_text_encode_ALT import *
+
 # --------------------------------------------------------------------------------
 #
 # --------------------------------------------------------------------------------
 NODE_CLASS_MAPPINGS = {
+    "Clip Text Encode ALT (Shinsplat)": Shinsplat_CLIPTextEncodeALT,
     "Test Node (Shinsplat)": Shinsplat_TestNode,
     "Clip Text Encode (Shinsplat)": Shinsplat_CLIPTextEncode,
     "Clip Text Encode T5 (Shinsplat)": Shinsplat_CLIPTextEncodeT5,
@@ -52,9 +56,11 @@ NODE_CLASS_MAPPINGS = {
     "Nupoma (Shinsplat)": Shinsplat_Nupoma,
     "KSampler (Shinsplat)": Shinsplat_KSampler,
     "Shinsplat_CLIPTextEncodeFlux": Shinsplat_CLIPTextEncodeFlux,
+    "Upscale WEBP (Shinsplat)": Shinsplat_UpscaleWEBP,
 
 }
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "Clip Text Encode ALT (Shinsplat)": "Clip Text Encode ALT (Shinsplat)",
     "Test Node (Shinsplat)": "Test Node (Shinsplat)",
     "Clip Text Encode (Shinsplat)": "Clip Text Encode (Shinsplat)",
     "Clip Text Encode T5 (Shinsplat)": "Clip Text Encode T5 (Shinsplat)",
@@ -73,7 +79,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Nupoma (Shinsplat)": "Nupoma (Shinsplat)",
     "KSampler (Shinsplat)": "KSampler (Shinsplat)",
     "Shinsplat_CLIPTextEncodeFlux": "CLIP Text Encode Flux (Shinsplat)",
-
+    "Shinsplat_UpscaleWEBP": "Upscale WEBP (Shinsplat)",
 }
 WEB_DIRECTORY = "./web"
 __all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']
