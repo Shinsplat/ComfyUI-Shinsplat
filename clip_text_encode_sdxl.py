@@ -1,6 +1,7 @@
 # Shinsplat Tarterbox
 import json
 import os
+import torch
 
 from nodes import MAX_RESOLUTION
 # --------------------------------------------------------------------------------
@@ -31,7 +32,7 @@ class Shinsplat_CLIPTextEncodeSDXL:
     """
 
     def __init__(self):
-        pass
+        self.token_pairs = {'g': [], 'l': []}
 
     @classmethod
     def INPUT_TYPES(s):
@@ -56,9 +57,24 @@ class Shinsplat_CLIPTextEncodeSDXL:
     CATEGORY = "advanced/Shinsplat"
 
     def encode(self, clip, width, height, crop_w, crop_h, target_width, target_height, text_g, text_l, pony_g, pony_l):
+        # Reset token pairs for this encode
+        self.token_pairs['l'] = []
+        self.token_pairs['g'] = []
 
+        # Store raw text
         text_g_raw = text_g
         text_l_raw = text_l
+
+        # Sanitize input text
+        def sanitize_text(text):
+            # Split by commas, strip whitespace, filter empty parts
+            parts = [p.strip() for p in text.split(',') if p.strip()]
+            # Join with comma space after each token
+            return ' '.join(p + ', ' for p in parts).rstrip(', ')
+
+        # Sanitize both inputs
+        text_g = sanitize_text(text_g)
+        text_l = sanitize_text(text_l)
 
         # Put the pony stuff in if enabled.
         if pony_g == True:
@@ -82,7 +98,31 @@ class Shinsplat_CLIPTextEncodeSDXL:
             if 'g' not in tokens:
                 tokens['g'] = []
             for tensor_block in temp_tokens['g']:
-                tokens['g'].append(tensor_block)
+                scaled_block = []
+                for token, weight in tensor_block:
+                    if torch.is_tensor(token):
+                        # Store token and name if it's an embedding
+                        if "embedding:" in block.strip():
+                            embedding_name = block.strip()[block.strip().find("embedding:"):].split(",")[0].strip()
+                            self.token_pairs['g'].append((token, embedding_name))
+                            
+                        # Check embedding dimensions
+                        if token.shape[0] == 768:
+                            print("Warning: Detected SD1.5 embedding (768-dim). These embeddings are not compatible with SDXL.")
+                            print("Please use SDXL-specific embeddings (1280-dim) for proper results.")
+                            # Skip this embedding
+                            continue
+                        # Check embedding dimensions
+                        if token.shape[0] != 1280:
+                            print(f"Warning: Detected unknown embedding ({token.shape[0]}-dim). These embeddings are not compatible with SDXL.")
+                            print("Please use SDXL-specific embeddings (1280-dim) for proper results.")
+                            # Skip this embedding
+                            continue
+                        else:
+                            scaled_block.append((token, weight))
+                    else:
+                        scaled_block.append((token, weight))
+                tokens['g'].append(scaled_block)
 
         # I need to define the 'l' key later so I need this base first specifically for this
         # SDXL encoder.  I'm doing this in case I never hit the 'g'.
@@ -97,7 +137,31 @@ class Shinsplat_CLIPTextEncodeSDXL:
             if 'l' not in tokens:
                 tokens['l'] = []
             for tensor_block in temp_tokens['l']:
-                tokens['l'].append(tensor_block)
+                scaled_block = []
+                for token, weight in tensor_block:
+                    if torch.is_tensor(token):
+                        # Store token and name if it's an embedding
+                        if "embedding:" in block.strip():
+                            embedding_name = block.strip()[block.strip().find("embedding:"):].split(",")[0].strip()
+                            self.token_pairs['l'].append((token, embedding_name))
+                            
+                        # Check embedding dimensions
+                        if token.shape[0] == 768:
+                            print("Warning: Detected SD1.5 embedding (768-dim). These embeddings are not compatible with SDXL.")
+                            print("Please use SDXL-specific embeddings (1280-dim) for proper results.")
+                            # Skip this embedding
+                            continue
+                        # Check embedding dimensions
+                        if token.shape[0] != 1280:
+                            print(f"Warning: Detected unknown embedding ({token.shape[0]}-dim). These embeddings are not compatible with SDXL.")
+                            print("Please use SDXL-specific embeddings (1280-dim) for proper results.")
+                            # Skip this embedding
+                            continue
+                        else:
+                            scaled_block.append((token, weight))
+                    else:
+                        scaled_block.append((token, weight))
+                tokens['l'].append(scaled_block)
 
         # If I got nothing just perform a simple empty
         temp_tokens = clip.tokenize("")
@@ -120,7 +184,11 @@ class Shinsplat_CLIPTextEncodeSDXL:
         token_count = 0
         for tokens_g in tokens['g']:
             for token, weight, in tokens_g:
-                if token == 49407:
+                if torch.is_tensor(token):
+                    last_token = token  # Keep the tensor object
+                    token_count += 1
+                    continue  # Skip the end token check for tensors since the compare breaks
+                elif token == 49407:
                     break
                 else:
                     # Save the last token before the 'stop' in case it's useful in the future.
@@ -133,7 +201,19 @@ class Shinsplat_CLIPTextEncodeSDXL:
             tokens_count += "    Block: " + str(block_number) + " has "
             tokens_count += str(token_count) + " tokens\n"
             token_count = 0 # reset for next iter
-            tokens_count += "    End Token: " + str(last_token) + "\n"
+            if torch.is_tensor(last_token):
+                # Find name for this token
+                name = None
+                for t, n in self.token_pairs['g']:
+                    if torch.equal(t, last_token):
+                        name = n
+                        break
+                if name and last_token.shape[0] == 1280:
+                    tokens_count += f"    End Token: <{name}>\n"
+                elif last_token.shape[0] == 1280:
+                    tokens_count += "    End Token: <SDXL embedding>\n"
+            else:
+                tokens_count += "    End Token: " + str(last_token) + "\n"
 
         last_token = "Null"
 
@@ -143,7 +223,11 @@ class Shinsplat_CLIPTextEncodeSDXL:
         token_count = 0
         for tokens_l in tokens['l']:
             for token, weight, in tokens_l:
-                if token == 49407:
+                if torch.is_tensor(token):
+                    last_token = token  # Keep the tensor object
+                    token_count += 1
+                    continue  # Skip the end token check for tensors since the compare breaks
+                elif token == 49407:
                     break
                 else:
                     # Save the last token before the 'stop' in case it's useful in the future.
@@ -156,7 +240,19 @@ class Shinsplat_CLIPTextEncodeSDXL:
             tokens_count += "    Block: " + str(block_number) + " has "
             tokens_count += str(token_count) + " tokens\n"
             token_count = 0 # reset for next iter
-            tokens_count += "    End Token: " + str(last_token) + "\n"
+            if torch.is_tensor(last_token):
+                # Find name for this token
+                name = None
+                for t, n in self.token_pairs['l']:
+                    if torch.equal(t, last_token):
+                        name = n
+                        break
+                if name and last_token.shape[0] == 1280:
+                    tokens_count += f"    End Token: <{name}>\n"
+                elif last_token.shape[0] == 1280:
+                    tokens_count += "    End Token: <SDXL embedding>\n"
+            else:
+                tokens_count += "    End Token: " + str(last_token) + "\n"
 
         # Get the actual words that were identified as tokens.
         #
@@ -188,27 +284,73 @@ class Shinsplat_CLIPTextEncodeSDXL:
             block_number += 1
             tokens_used += "\n" + "- block_g: " + str(block_number) + " -\n"
             for token, weight, in tokens_g:
-                if token == 49406: # Start token
+                if torch.is_tensor(token):
+                    # Find name for this token
+                    name = None
+                    for t, n in self.token_pairs['g']:
+                        if torch.equal(t, token):
+                            name = n
+                            break
+                            
+                    if name:
+                        if token.shape[0] == 1280:
+                            tokens_used += f"<{name}> "
+                        elif token.shape[0] == 768:
+                            tokens_used += f"<{name}> (!SKIPPED!)"
+                        else:
+                            tokens_used += f"<{name}> (Unknown {token.shape[0]}d, skipped)"
+                    else:
+                        if token.shape[0] == 1280:
+                            tokens_used += "<SDXL embedding> "
+                        elif token.shape[0] == 768:
+                            tokens_used += "<SD1.5 embedding> (!SKIPPED!)"
+                        else:
+                            tokens_used += f"<{token.shape[0]}d embedding> (Unknown, skipped)"
                     continue
-                if token == 49407: # End token
+                elif token == 49406: # Start token
+                    continue
+                elif token == 49407: # End token
                     tokens_used += "\n"
                     break
-                if token not in tokens_dict:
+                elif token not in tokens_dict:
                     tokens_used += "<unk> "
                 else:
-                    word =  tokens_dict[token].replace("</w>", "")
+                    word = tokens_dict[token].replace("</w>", "")
                     tokens_used += word + " "
         block_number = 0
         for tokens_l in tokens['l']:
             block_number += 1
             tokens_used += "\n" + "- block_l: " + str(block_number) + " -\n"
             for token, weight, in tokens_l:
-                if token == 49406: # Start token
+                if torch.is_tensor(token):
+                    # Find name for this token
+                    name = None
+                    for t, n in self.token_pairs['l']:
+                        if torch.equal(t, token):
+                            name = n
+                            break
+                            
+                    if name:
+                        if token.shape[0] == 1280:
+                            tokens_used += f"<{name}> "
+                        elif token.shape[0] == 768:
+                            tokens_used += f"<{name}> (!SKIPPED!)"
+                        else:
+                            tokens_used += f"<{name}> (Unknown {token.shape[0]}d, skipped)"
+                    else:
+                        if token.shape[0] == 1280:
+                            tokens_used += "<SDXL embedding> "
+                        elif token.shape[0] == 768:
+                            tokens_used += "<SD1.5 embedding> (!SKIPPED!)"
+                        else:
+                            tokens_used += f"<{token.shape[0]}d embedding> (Unknown, skipped)"
                     continue
-                if token == 49407: # End token
+                elif token == 49406: # Start token
+                    continue
+                elif token == 49407: # End token
                     tokens_used += "\n"
                     break
-                if token not in tokens_dict:
+                elif token not in tokens_dict:
                     tokens_used += "<unk> "
                 else:
                     word = tokens_dict[token].replace("</w>", "")
@@ -231,6 +373,26 @@ class Shinsplat_CLIPTextEncodeSDXL:
         # And finally it's sent on it's way to the fun yard.
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
+
+        def dedupe_embeddings(text):
+            lines = text.splitlines()
+            result = []
+            
+            for line in lines:
+                if "," not in line or line.endswith("-"):
+                    result.append(line)
+                    continue
+                
+                parts = [p.strip() for p in line.split(",")]
+                for i in range(len(parts)):
+                    words = parts[i].split()
+                    seen = set()
+                    parts[i] = " ".join(w for w in words if not w.startswith("<") or w not in seen and not seen.add(w))
+                result.append(", ".join(parts))
+            
+            return "\n".join(result)
+            
+        tokens_used = dedupe_embeddings(tokens_used)
 
         return ([[cond, {"pooled_output": pooled, "width": width, "height": height, "crop_w": crop_w, "crop_h": crop_h, "target_width": target_width, "target_height": target_height}]], tokens_count, tokens_used, text_g_raw, text_l_raw)
 # --------------------------------------------------------------------------------
