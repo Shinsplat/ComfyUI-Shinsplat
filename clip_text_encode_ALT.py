@@ -74,7 +74,8 @@ class Shinsplat_CLIPTextEncodeALT:
 
         # B
         if not clip_l:
-            tokens["l"] = clip.tokenize("")['l']
+            if 'l' in tokens:
+                tokens["l"] = clip.tokenize("")['l']
         # /B
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
