@@ -1,6 +1,6 @@
 # Shinsplat Tarterbox
 
-from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
+#from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 
 # --------------------------------------------------------------------------------
 #
@@ -8,6 +8,11 @@ from comfy.comfy_types import IO, ComfyNodeABC, InputTypeDict
 class Shinsplat_CLIPTextEncodeALT:
     """
     - Shinsplat Tarterbox -
+
+    Clip_L is enabled by default, allowing the expected text to be duplicated cross
+    to t5 as well.  However, my experience shows that clip_l can introduce artifacts
+    and hallucinations so I personally choose not to use it so I created this option
+    to turn it off.
 
     There's an END directive that will ignore everything after it, which is a useful
     tool when you want to just go to the top of your prompt and test something simple.
@@ -27,18 +32,19 @@ class Shinsplat_CLIPTextEncodeALT:
     """
 
     @classmethod
-    def INPUT_TYPES(s) -> InputTypeDict:
+    def INPUT_TYPES(s):
         return {
             "required": {
-                "text": (IO.STRING, {"multiline": True, "dynamicPrompts": True, "tooltip": "The text to be encoded."}),
-                "clip": (IO.CLIP, {"tooltip": "The CLIP model used for encoding the text."})
+                "text": ("STRING", {"multiline": True, "dynamicPrompts": True, "tooltip": "The text to be encoded."}),
+                "clip": ("CLIP", {"tooltip": "The CLIP model used for encoding the text."}),
+                "clip_l": ("BOOLEAN", {"default": True}),
             },
             "optional": {
                         "prompt_before": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
                         "prompt_after": ("STRING", {"multiline": True, "default": "", "forceInput": True}),
             },
         }
-    RETURN_TYPES = (IO.CONDITIONING, IO.STRING,)
+    RETURN_TYPES = ("CONDITIONING", "STRING",)
     RETURN_NAMES = ("CONDITIONING", "_prompt_out",)
 
     OUTPUT_TOOLTIPS = ("A conditioning containing the embedded text used to guide the diffusion model with directives.",)
@@ -47,7 +53,7 @@ class Shinsplat_CLIPTextEncodeALT:
     CATEGORY = "advanced/Shinsplat"
     DESCRIPTION = "Encodes a text prompt using a CLIP model into an embedding that can be used to guide the diffusion model towards generating specific images."
 
-    def encode(self, clip, text, prompt_before="", prompt_after="",):
+    def encode(self, clip, text, clip_l=True, prompt_before="", prompt_after="",):
         if clip is None:
             raise RuntimeError("ERROR: clip input is invalid: None\n\nIf the clip is from a checkpoint loader node your checkpoint does not contain a valid clip or text encoder model.")
 
@@ -62,8 +68,20 @@ class Shinsplat_CLIPTextEncodeALT:
                 text = text + " " + prompt_after
         # /F
 
+
         tokens = clip.tokenize(text)
-        return (clip.encode_from_tokens_scheduled(tokens), prompt_out)
+
+        # B
+        if not clip_l:
+            print("Shinsplat: clip_text_encode_ALT - clip_l disabled, stripping encoding...")
+            tokens["l"] = clip.tokenize("")['l']
+        # /B
+
+        cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
+
+
+        return ([[cond, {"pooled_output": pooled}]], prompt_out)
+        #return (clip.encode_from_tokens_scheduled(tokens), prompt_out)
 
 # --------------------------------------------------------------------------------
 #
