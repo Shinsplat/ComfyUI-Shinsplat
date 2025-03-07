@@ -1,7 +1,10 @@
-shinsplat_clip_text_encode_alt:
-	2/9/2025
-		A simple conversion of the text encoder to recognize the END
-		directive and provide nodes for Green Box and an prompt output.
+clips_text_encode_ALT:
+	4/7/2025
+		I'm not keeping up with this file so I see that a previous entry is missing,
+		this node has been updated to allow for the stipping of clip_l, which I
+		believe is causing artifacts for Flux when the data is already present in T5.
+
+		This also has prompt_before/after and a related output.
 shinsplat_tensor_toys:
 	7/8/2024
 		See Tensor_Toys.txt for explanation.
