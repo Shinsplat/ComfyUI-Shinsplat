@@ -38,6 +38,7 @@ class Shinsplat_CLIPTextEncodeALT:
                 "text": ("STRING", {"multiline": True, "dynamicPrompts": True, "tooltip": "The text to be encoded."}),
                 "clip": ("CLIP", {"tooltip": "The CLIP model used for encoding the text."}),
                 "clip_l": ("BOOLEAN", {"default": True}),
+                #"clip_zero": ("BOOLEAN", {"default": True}),
             },
             "optional": {
                         "prompt_before": ("STRING", {"multiline": True, "default": "", "forceInput": True}),                
@@ -53,11 +54,12 @@ class Shinsplat_CLIPTextEncodeALT:
     CATEGORY = "advanced/Shinsplat"
     DESCRIPTION = "Encodes a text prompt using a CLIP model into an embedding that can be used to guide the diffusion model towards generating specific images."
 
+    #def encode(self, clip, text, clip_l=True, clip_zero=True, prompt_before="", prompt_after="",):
     def encode(self, clip, text, clip_l=True, prompt_before="", prompt_after="",):
         if clip is None:
             raise RuntimeError("ERROR: clip input is invalid: None\n\nIf the clip is from a checkpoint loader node your checkpoint does not contain a valid clip or text encoder model.")
 
-        # F
+        # B
         text = text.split("END")[0]
         prompt_out = text
         prompt_before = prompt_before.split("END")[0]
@@ -66,22 +68,18 @@ class Shinsplat_CLIPTextEncodeALT:
                 text = prompt_before + " " + " " + text
         if prompt_after != "":
                 text = text + " " + prompt_after
-        # /F
-
+        # /B
 
         tokens = clip.tokenize(text)
 
         # B
         if not clip_l:
-            print("Shinsplat: clip_text_encode_ALT - clip_l disabled, stripping encoding...")
             tokens["l"] = clip.tokenize("")['l']
         # /B
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
 
-
         return ([[cond, {"pooled_output": pooled}]], prompt_out)
-        #return (clip.encode_from_tokens_scheduled(tokens), prompt_out)
 
 # --------------------------------------------------------------------------------
 #
