@@ -1,4 +1,9 @@
-clips_text_encode_ALT:
+clip_text_encod:
+	4/7/2025
+		Updated so that the CONDITIONING output can also exclue clip_l where previously
+		it only the tokens_encode would perform this way.  For a simpler method you can
+		use clip_text_encode_ALT.
+clip_text_encode_ALT:
 	4/7/2025
 		I'm not keeping up with this file so I see that a previous entry is missing,
 		this node has been updated to allow for the stipping of clip_l, which I

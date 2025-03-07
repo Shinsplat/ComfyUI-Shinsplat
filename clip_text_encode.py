@@ -480,6 +480,15 @@ class Shinsplat_CLIPTextEncode:
                     else:
                         word =  tokens_dict[token].replace("</w>", "")
                         tokens_used += word + " "
+        # B
+        # For the CONDITIONING output I need to adjust cond so that it does not include clip_l
+        # in case that's turned off.  There's a separate process for tokens_encode which has
+        # already been dealt with, and is also paired with clip_tokens_encode but for this
+        # particular, standard, output I need to adjust ITS conditioning altering its tokens.
+        if not clip_l:
+            if 'l' in tokens:
+                tokens["l"] = clip.tokenize("")['l']
+        # /B
 
         cond, pooled = clip.encode_from_tokens(tokens, return_pooled=True)
 
