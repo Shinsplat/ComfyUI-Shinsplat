@@ -29,7 +29,6 @@ from .seed import *
 from .nupoma import *
 from .ksampler import *
 from .clip_text_encode_flux import *
-from .upscale_webp import *
 from .clip_text_encode_ALT import *
 
 # --------------------------------------------------------------------------------
